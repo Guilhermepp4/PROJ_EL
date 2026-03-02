@@ -14,6 +14,7 @@ Term → id | number
 
 tree = parser.parse(text)
 
+print("Parsed tree(AST): \n")
 print(tree.pretty())
 
 grammar_dict = {}
@@ -32,5 +33,6 @@ for rule in tree.children:
                 symbols.append(str(s.children[0]))
         productions.append(symbols)
     grammar_dict[nt] = productions
+print("\nGrammar Dictionary: \n")
 for x in grammar_dict.keys():
-    print(f"{x} -> {grammar_dict[x]}\n")
+    print(f"{x} -> {grammar_dict[x]}")
