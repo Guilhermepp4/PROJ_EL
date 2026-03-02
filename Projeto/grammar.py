@@ -8,7 +8,7 @@ rhs : production ("|" production)*
 
 production : symbol (TOKEN? symbol)*
 
-symbol : NT | T | EPS | symbol | symbol
+symbol : NT | T | EPS 
 
 ARROW: "→"|"->" 
 EPS: "ε"
@@ -23,7 +23,6 @@ T: /[a-z0-9+*\/:=;\[\]\(\)\'\"]+/
 
 %ignore /[ \t\f\n]+/
 """
-
 
 
 # token = """
