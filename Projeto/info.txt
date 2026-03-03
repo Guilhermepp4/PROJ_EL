@@ -13,14 +13,14 @@
 #     | '1' S '1'
 #     | '0'
 #     | '1'
-#     | 'e' "epsilon"
+#     | 'ε'
 # """
 
 
 # gramatica_trabalhar = """
 # Lista -> '[' Elems ']'
 
-# Elems -> e
+# Elems -> ε
 #     |   Elem ',' Elems
 
 # Elem -> int

@@ -3,13 +3,11 @@ from lark import Token, Tree, Lark
 
 parser = Lark(grammar, start="start")
 
-text = """Program → StmtList
-StmtList → Stmt StmtList'
-StmtList' → ; Stmt StmtList' | ε
-Stmt → id := Expr
-Expr → Term Expr'
-Expr' → + Term Expr' | ε
-Term → id | number
+text = """Lista -> '[' Elems ']'
+Elems -> ε
+     |   Elem ',' Elems
+
+Elem -> int
 """
 
 tree = parser.parse(text)
