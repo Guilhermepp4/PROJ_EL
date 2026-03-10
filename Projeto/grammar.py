@@ -24,7 +24,6 @@ T: /[a-z0-9+*\/:=;\[\]\(\)\'\"]+/
 %ignore /[ \t\f\n]+/
 """
 
-
 # token = """
 # NT     = identificador de não-terminal
 # T      = identificador de terminal

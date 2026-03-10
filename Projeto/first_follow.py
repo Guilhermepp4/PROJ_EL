@@ -1,7 +1,8 @@
 from parser import grammar_dict
 
 def compute_first():
-    first = {nt : set() for nt in grammar_dict}
+    first = {nt : [] for nt in grammar_dict}
+    
     reverserd_grammar = dict(reversed(list(grammar_dict.items())))
     
     changed = True
@@ -14,43 +15,53 @@ def compute_first():
                     #Se for terminal
                     if symbol not in reverserd_grammar:
                         #print("HERE",symbol)
-                        first[A].add(symbol)
+                        first[A].append(symbol)
                         #print("HERE2",first[A])
                         break
                     
                     #Se não for terminal
                     else:
-                        first[A] |= (first[symbol] - {"ε"})
+                        first[A] += first[symbol]
 
                         if 'ε' not in first[symbol]:
                             break
+                        first[A].remove('ε')
                     if before != len(first[A]):
                         changed = True
     
-    # print("\nFirst")
-    # for f in first:
-    #     print(f"{f} -> {first[f]}")
+    print("First")
+    for f in first:
+        print(f"{f} -> {first[f]}")
     
     return first
 
 def compute_follow(first):
-    follow = {nt : set() for nt in grammar_dict}
+    follow = {nt : [] for nt in grammar_dict}
     i=0
     for nt in grammar_dict:
         i = i + 1
         if i == 1:
-            follow[nt].add('$')
+            follow[nt].append('$')
             continue
         
         for A in grammar_dict:
             for production in grammar_dict[A]: 
                 for j in range(0, len(production)-1):
                     if production[j] == nt:
+                        #print("HERE: ",A, "Produc: ",production[j])
                         if production[j+1] not in grammar_dict:
-                            follow[nt].add(production[j+1])
+                            follow[nt].append(production[j+1])
                             break
                         else:
-                            follow[nt] |= (first[production[j+1]] - {"ε"})
+                            follow[nt] += first[production[j+1]]
+
+                            if 'ε' not in first[production[j+1]]:
+                                
+                                break
+                            else:
+                                #print("HERE: ", A)
+                                follow[nt].remove('ε')
+                                follow[nt] += follow[A] 
                         
                         
     print("\nFollow")
