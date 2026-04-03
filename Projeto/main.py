@@ -9,8 +9,11 @@ Program : Lista
 Lista -> '[' Elems ']'
 Elems -> ε
     | Elem ',' Elems
-Elem -> int
+Elem -> INT | ID
+
+INT = /[0-9]+/
 """
+
 
 def exec_pipeline(info):
     print("Welcome to Grammar Playground\n")
@@ -21,7 +24,7 @@ def exec_pipeline(info):
     
     if resultado_ast:
         print("\nAST (Estrutura de Dados):")
-        pprint.pprint(resultado_ast, indent=4)
+        resultado_ast.print_tree()
 
     else:
         print("Erro: O parser não devolveu resultados.")

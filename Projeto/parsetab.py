@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'initARROW COLON EPSILON EQUALS NEWLINE NON_TERMINAL PIPE PROGRAM REGEX TERMINALinit : program newlines gramatica token_sectionprogram : PROGRAM COLON NON_TERMINALgramatica : lista_regraslista_regras : regra lista_regraslista_regras : regra : NON_TERMINAL ARROW lista_producoes newlinesregra : NON_TERMINAL ARROW lista_producoeslista_producoes : producao lista_producoes_restlista_producoes_rest : PIPE producao lista_producoes_restlista_producoes_rest : producao : simbolo lista_simbolosproducao : EPSILONlista_simbolos : simbolo lista_simboloslista_simbolos : simbolo : TERMINALsimbolo : NON_TERMINALtoken_section : token_decl token_sectiontoken_section : token_decl : TERMINAL EQUALS REGEX newlinestoken_decl : TERMINAL EQUALS REGEXnewlines : NEWLINE\n               | NEWLINE newlines'
+_lr_signature = 'initARROW COLON EPSILON EQUALS NEWLINE NON_TERMINAL PIPE PROGRAM REGEX TERMINALinit : program newlines lista_regras token_sectionprogram : PROGRAM COLON NON_TERMINALlista_regras : regra lista_regraslista_regras : regra : NON_TERMINAL ARROW lista_producoes newlinesregra : NON_TERMINAL ARROW lista_producoeslista_producoes : producao lista_producoes_restlista_producoes_rest : PIPE producao lista_producoes_restlista_producoes_rest : producao : simbolo lista_simbolosproducao : EPSILONlista_simbolos : simbolo lista_simboloslista_simbolos : simbolo : TERMINALsimbolo : NON_TERMINALtoken_section : token_decl token_sectiontoken_section : token_decl : TERMINAL EQUALS REGEX newlinestoken_decl : TERMINAL EQUALS REGEXnewlines : NEWLINE\n               | NEWLINE newlines'
     
-_lr_action_items = {'PROGRAM':([0,],[3,]),'$end':([1,4,5,7,8,9,11,13,14,16,18,20,21,22,23,24,25,26,27,28,30,31,32,33,34,35,],[0,-5,-21,-18,-3,-5,-22,-1,-18,-4,-17,-16,-7,-10,-14,-12,-15,-20,-6,-8,-14,-11,-19,-10,-13,-9,]),'NEWLINE':([2,5,12,20,21,22,23,24,25,26,28,30,31,33,34,35,],[5,5,-2,-16,5,-10,-14,-12,-15,5,-8,-14,-11,-10,-13,-9,]),'COLON':([3,],[6,]),'TERMINAL':([4,5,7,8,9,11,14,16,17,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,],[-5,-21,15,-3,-5,-22,15,-4,25,-16,-7,-10,25,-12,-15,-20,-6,-8,25,25,-11,-19,-10,-13,-9,]),'NON_TERMINAL':([4,5,6,9,11,17,20,21,22,23,24,25,27,28,29,30,31,33,34,35,],[10,-21,12,10,-22,20,-16,-7,-10,20,-12,-15,-6,-8,20,20,-11,-10,-13,-9,]),'ARROW':([10,],[17,]),'EQUALS':([15,],[19,]),'EPSILON':([17,29,],[24,24,]),'REGEX':([19,],[26,]),'PIPE':([20,22,23,24,25,30,31,33,34,],[-16,29,-14,-12,-15,-14,-11,29,-13,]),}
+_lr_action_items = {'PROGRAM':([0,],[3,]),'$end':([1,4,5,7,8,10,12,13,15,17,19,20,21,22,23,24,25,26,27,29,30,31,32,33,34,],[0,-4,-20,-17,-4,-21,-1,-17,-3,-16,-15,-6,-9,-13,-11,-14,-19,-5,-7,-13,-10,-18,-9,-12,-8,]),'NEWLINE':([2,5,11,19,20,21,22,23,24,25,27,29,30,32,33,34,],[5,5,-2,-15,5,-9,-13,-11,-14,5,-7,-13,-10,-9,-12,-8,]),'COLON':([3,],[6,]),'TERMINAL':([4,5,7,8,10,13,15,16,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,],[-4,-20,14,-4,-21,14,-3,24,-15,-6,-9,24,-11,-14,-19,-5,-7,24,24,-10,-18,-9,-12,-8,]),'NON_TERMINAL':([4,5,6,8,10,16,19,20,21,22,23,24,26,27,28,29,30,32,33,34,],[9,-20,11,9,-21,19,-15,-6,-9,19,-11,-14,-5,-7,19,19,-10,-9,-12,-8,]),'ARROW':([9,],[16,]),'EQUALS':([14,],[18,]),'EPSILON':([16,28,],[23,23,]),'REGEX':([18,],[25,]),'PIPE':([19,21,22,23,24,29,30,32,33,],[-15,28,-13,-11,-14,-13,-10,28,-12,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'init':([0,],[1,]),'program':([0,],[2,]),'newlines':([2,5,21,26,],[4,11,27,32,]),'gramatica':([4,],[7,]),'lista_regras':([4,9,],[8,16,]),'regra':([4,9,],[9,9,]),'token_section':([7,14,],[13,18,]),'token_decl':([7,14,],[14,14,]),'lista_producoes':([17,],[21,]),'producao':([17,29,],[22,33,]),'simbolo':([17,23,29,30,],[23,30,23,30,]),'lista_producoes_rest':([22,33,],[28,35,]),'lista_simbolos':([23,30,],[31,34,]),}
+_lr_goto_items = {'init':([0,],[1,]),'program':([0,],[2,]),'newlines':([2,5,20,25,],[4,10,26,31,]),'lista_regras':([4,8,],[7,15,]),'regra':([4,8,],[8,8,]),'token_section':([7,13,],[12,17,]),'token_decl':([7,13,],[13,13,]),'lista_producoes':([16,],[20,]),'producao':([16,28,],[21,32,]),'simbolo':([16,22,28,29,],[22,29,22,29,]),'lista_producoes_rest':([21,32,],[27,34,]),'lista_simbolos':([22,29,],[30,33,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -27,26 +27,25 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> init","S'",1,None,None,None),
-  ('init -> program newlines gramatica token_section','init',4,'p_init','parser_grammar.py',7),
-  ('program -> PROGRAM COLON NON_TERMINAL','program',3,'p_program','parser_grammar.py',11),
-  ('gramatica -> lista_regras','gramatica',1,'p_gramatica','parser_grammar.py',15),
-  ('lista_regras -> regra lista_regras','lista_regras',2,'p_lista_regras','parser_grammar.py',19),
-  ('lista_regras -> <empty>','lista_regras',0,'p_lista_regras_empty','parser_grammar.py',23),
-  ('regra -> NON_TERMINAL ARROW lista_producoes newlines','regra',4,'p_regra_newLine','parser_grammar.py',27),
-  ('regra -> NON_TERMINAL ARROW lista_producoes','regra',3,'p_regra_sem_newLine','parser_grammar.py',31),
-  ('lista_producoes -> producao lista_producoes_rest','lista_producoes',2,'p_lista_producoes','parser_grammar.py',35),
-  ('lista_producoes_rest -> PIPE producao lista_producoes_rest','lista_producoes_rest',3,'p_lista_producoes_rest','parser_grammar.py',40),
-  ('lista_producoes_rest -> <empty>','lista_producoes_rest',0,'p_lista_producoes_rest_empty','parser_grammar.py',44),
-  ('producao -> simbolo lista_simbolos','producao',2,'p_producao','parser_grammar.py',48),
-  ('producao -> EPSILON','producao',1,'p_producao_epsilon','parser_grammar.py',52),
-  ('lista_simbolos -> simbolo lista_simbolos','lista_simbolos',2,'p_lista_simbolos','parser_grammar.py',56),
-  ('lista_simbolos -> <empty>','lista_simbolos',0,'p_lista_simbolos_empty','parser_grammar.py',60),
-  ('simbolo -> TERMINAL','simbolo',1,'p_simbolo_term','parser_grammar.py',64),
-  ('simbolo -> NON_TERMINAL','simbolo',1,'p_simbolo_non_term','parser_grammar.py',68),
-  ('token_section -> token_decl token_section','token_section',2,'p_token_section','parser_grammar.py',72),
-  ('token_section -> <empty>','token_section',0,'p_token_section_empty','parser_grammar.py',76),
-  ('token_decl -> TERMINAL EQUALS REGEX newlines','token_decl',4,'p_token_newline','parser_grammar.py',80),
-  ('token_decl -> TERMINAL EQUALS REGEX','token_decl',3,'p_token_sem_newline','parser_grammar.py',84),
-  ('newlines -> NEWLINE','newlines',1,'p_newlines','parser_grammar.py',88),
-  ('newlines -> NEWLINE newlines','newlines',2,'p_newlines','parser_grammar.py',89),
+  ('init -> program newlines lista_regras token_section','init',4,'p_init','parser_grammar.py',9),
+  ('program -> PROGRAM COLON NON_TERMINAL','program',3,'p_program','parser_grammar.py',14),
+  ('lista_regras -> regra lista_regras','lista_regras',2,'p_lista_regras','parser_grammar.py',18),
+  ('lista_regras -> <empty>','lista_regras',0,'p_lista_regras_empty','parser_grammar.py',24),
+  ('regra -> NON_TERMINAL ARROW lista_producoes newlines','regra',4,'p_regra_newLine','parser_grammar.py',28),
+  ('regra -> NON_TERMINAL ARROW lista_producoes','regra',3,'p_regra_sem_newLine','parser_grammar.py',33),
+  ('lista_producoes -> producao lista_producoes_rest','lista_producoes',2,'p_lista_producoes','parser_grammar.py',38),
+  ('lista_producoes_rest -> PIPE producao lista_producoes_rest','lista_producoes_rest',3,'p_lista_producoes_rest','parser_grammar.py',43),
+  ('lista_producoes_rest -> <empty>','lista_producoes_rest',0,'p_lista_producoes_rest_empty','parser_grammar.py',48),
+  ('producao -> simbolo lista_simbolos','producao',2,'p_producao','parser_grammar.py',52),
+  ('producao -> EPSILON','producao',1,'p_producao_epsilon','parser_grammar.py',57),
+  ('lista_simbolos -> simbolo lista_simbolos','lista_simbolos',2,'p_lista_simbolos','parser_grammar.py',61),
+  ('lista_simbolos -> <empty>','lista_simbolos',0,'p_lista_simbolos_empty','parser_grammar.py',65),
+  ('simbolo -> TERMINAL','simbolo',1,'p_simbolo_term','parser_grammar.py',69),
+  ('simbolo -> NON_TERMINAL','simbolo',1,'p_simbolo_non_term','parser_grammar.py',73),
+  ('token_section -> token_decl token_section','token_section',2,'p_token_section','parser_grammar.py',77),
+  ('token_section -> <empty>','token_section',0,'p_token_section_empty','parser_grammar.py',81),
+  ('token_decl -> TERMINAL EQUALS REGEX newlines','token_decl',4,'p_token_newline','parser_grammar.py',85),
+  ('token_decl -> TERMINAL EQUALS REGEX','token_decl',3,'p_token_sem_newline','parser_grammar.py',90),
+  ('newlines -> NEWLINE','newlines',1,'p_newlines','parser_grammar.py',94),
+  ('newlines -> NEWLINE newlines','newlines',2,'p_newlines','parser_grammar.py',95),
 ]

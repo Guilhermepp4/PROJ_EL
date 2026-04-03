@@ -12,7 +12,6 @@ tokens = (
 t_ARROW     = r'->|→'
 t_EQUALS    = r'='
 t_COLON     = r':'
-
 t_ignore = ' \t'
 
 # Terminais escritos explicitamente entre aspas: 'id', '+'
@@ -29,7 +28,7 @@ def t_TERMINAL_QUOTED(t):
 
 def t_REGEX(t):
     r'/[^/]+/'
-    t.value = t.value[1:-1]   # remove as barras delimitadoras
+    t.value = t.value[1:-1]
     return t
 
 def t_IDENTIFIER(t):
@@ -43,13 +42,12 @@ def t_IDENTIFIER(t):
     elif base == 'epsilon':
         t.type = 'EPSILON'
     
-    elif re.fullmatch(r'[A-Z][A-Z0-9_]*', value): # Se for tudo maiúsculas
+    elif re.fullmatch(r'[A-Z][A-Z0-9_]*', value):
         if len(value) == 1:
-            t.type = 'NON_TERMINAL' # S, A, B
+            t.type = 'NON_TERMINAL'
         else:
-            t.type = 'TERMINAL'     # ID, NUMBER
+            t.type = 'TERMINAL'
     else:
-        # Se tiver minúsculas (Expr, lista), é Não-Terminal
         t.type = 'NON_TERMINAL'
     return t
 

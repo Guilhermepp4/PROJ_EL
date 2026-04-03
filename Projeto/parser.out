@@ -3,65 +3,63 @@ Created by PLY version 3.11 (http://www.dabeaz.com/ply)
 Grammar
 
 Rule 0     S' -> init
-Rule 1     init -> program newlines gramatica token_section
+Rule 1     init -> program newlines lista_regras token_section
 Rule 2     program -> PROGRAM COLON NON_TERMINAL
-Rule 3     gramatica -> lista_regras
-Rule 4     lista_regras -> regra lista_regras
-Rule 5     lista_regras -> <empty>
-Rule 6     regra -> NON_TERMINAL ARROW lista_producoes newlines
-Rule 7     regra -> NON_TERMINAL ARROW lista_producoes
-Rule 8     lista_producoes -> producao lista_producoes_rest
-Rule 9     lista_producoes_rest -> PIPE producao lista_producoes_rest
-Rule 10    lista_producoes_rest -> <empty>
-Rule 11    producao -> simbolo lista_simbolos
-Rule 12    producao -> EPSILON
-Rule 13    lista_simbolos -> simbolo lista_simbolos
-Rule 14    lista_simbolos -> <empty>
-Rule 15    simbolo -> TERMINAL
-Rule 16    simbolo -> NON_TERMINAL
-Rule 17    token_section -> token_decl token_section
-Rule 18    token_section -> <empty>
-Rule 19    token_decl -> TERMINAL EQUALS REGEX newlines
-Rule 20    token_decl -> TERMINAL EQUALS REGEX
-Rule 21    newlines -> NEWLINE
-Rule 22    newlines -> NEWLINE newlines
+Rule 3     lista_regras -> regra lista_regras
+Rule 4     lista_regras -> <empty>
+Rule 5     regra -> NON_TERMINAL ARROW lista_producoes newlines
+Rule 6     regra -> NON_TERMINAL ARROW lista_producoes
+Rule 7     lista_producoes -> producao lista_producoes_rest
+Rule 8     lista_producoes_rest -> PIPE producao lista_producoes_rest
+Rule 9     lista_producoes_rest -> <empty>
+Rule 10    producao -> simbolo lista_simbolos
+Rule 11    producao -> EPSILON
+Rule 12    lista_simbolos -> simbolo lista_simbolos
+Rule 13    lista_simbolos -> <empty>
+Rule 14    simbolo -> TERMINAL
+Rule 15    simbolo -> NON_TERMINAL
+Rule 16    token_section -> token_decl token_section
+Rule 17    token_section -> <empty>
+Rule 18    token_decl -> TERMINAL EQUALS REGEX newlines
+Rule 19    token_decl -> TERMINAL EQUALS REGEX
+Rule 20    newlines -> NEWLINE
+Rule 21    newlines -> NEWLINE newlines
 
 Terminals, with rules where they appear
 
-ARROW                : 6 7
+ARROW                : 5 6
 COLON                : 2
-EPSILON              : 12
-EQUALS               : 19 20
-NEWLINE              : 21 22
-NON_TERMINAL         : 2 6 7 16
-PIPE                 : 9
+EPSILON              : 11
+EQUALS               : 18 19
+NEWLINE              : 20 21
+NON_TERMINAL         : 2 5 6 15
+PIPE                 : 8
 PROGRAM              : 2
-REGEX                : 19 20
-TERMINAL             : 15 19 20
+REGEX                : 18 19
+TERMINAL             : 14 18 19
 error                : 
 
 Nonterminals, with rules where they appear
 
-gramatica            : 1
 init                 : 0
-lista_producoes      : 6 7
-lista_producoes_rest : 8 9
-lista_regras         : 3 4
-lista_simbolos       : 11 13
-newlines             : 1 6 19 22
-producao             : 8 9
+lista_producoes      : 5 6
+lista_producoes_rest : 7 8
+lista_regras         : 1 3
+lista_simbolos       : 10 12
+newlines             : 1 5 18 21
+producao             : 7 8
 program              : 1
-regra                : 4
-simbolo              : 11 13
-token_decl           : 17
-token_section        : 1 17
+regra                : 3
+simbolo              : 10 12
+token_decl           : 16
+token_section        : 1 16
 
 Parsing method: LALR
 
 state 0
 
     (0) S' -> . init
-    (1) init -> . program newlines gramatica token_section
+    (1) init -> . program newlines lista_regras token_section
     (2) program -> . PROGRAM COLON NON_TERMINAL
 
     PROGRAM         shift and go to state 3
@@ -77,9 +75,9 @@ state 1
 
 state 2
 
-    (1) init -> program . newlines gramatica token_section
-    (21) newlines -> . NEWLINE
-    (22) newlines -> . NEWLINE newlines
+    (1) init -> program . newlines lista_regras token_section
+    (20) newlines -> . NEWLINE
+    (21) newlines -> . NEWLINE newlines
 
     NEWLINE         shift and go to state 5
 
@@ -94,382 +92,372 @@ state 3
 
 state 4
 
-    (1) init -> program newlines . gramatica token_section
-    (3) gramatica -> . lista_regras
-    (4) lista_regras -> . regra lista_regras
-    (5) lista_regras -> .
-    (6) regra -> . NON_TERMINAL ARROW lista_producoes newlines
-    (7) regra -> . NON_TERMINAL ARROW lista_producoes
+    (1) init -> program newlines . lista_regras token_section
+    (3) lista_regras -> . regra lista_regras
+    (4) lista_regras -> .
+    (5) regra -> . NON_TERMINAL ARROW lista_producoes newlines
+    (6) regra -> . NON_TERMINAL ARROW lista_producoes
 
-    TERMINAL        reduce using rule 5 (lista_regras -> .)
-    $end            reduce using rule 5 (lista_regras -> .)
-    NON_TERMINAL    shift and go to state 10
+    TERMINAL        reduce using rule 4 (lista_regras -> .)
+    $end            reduce using rule 4 (lista_regras -> .)
+    NON_TERMINAL    shift and go to state 9
 
-    gramatica                      shift and go to state 7
-    lista_regras                   shift and go to state 8
-    regra                          shift and go to state 9
+    lista_regras                   shift and go to state 7
+    regra                          shift and go to state 8
 
 state 5
 
-    (21) newlines -> NEWLINE .
-    (22) newlines -> NEWLINE . newlines
-    (21) newlines -> . NEWLINE
-    (22) newlines -> . NEWLINE newlines
+    (20) newlines -> NEWLINE .
+    (21) newlines -> NEWLINE . newlines
+    (20) newlines -> . NEWLINE
+    (21) newlines -> . NEWLINE newlines
 
-    NON_TERMINAL    reduce using rule 21 (newlines -> NEWLINE .)
-    TERMINAL        reduce using rule 21 (newlines -> NEWLINE .)
-    $end            reduce using rule 21 (newlines -> NEWLINE .)
+    NON_TERMINAL    reduce using rule 20 (newlines -> NEWLINE .)
+    TERMINAL        reduce using rule 20 (newlines -> NEWLINE .)
+    $end            reduce using rule 20 (newlines -> NEWLINE .)
     NEWLINE         shift and go to state 5
 
-    newlines                       shift and go to state 11
+    newlines                       shift and go to state 10
 
 state 6
 
     (2) program -> PROGRAM COLON . NON_TERMINAL
 
-    NON_TERMINAL    shift and go to state 12
+    NON_TERMINAL    shift and go to state 11
 
 
 state 7
 
-    (1) init -> program newlines gramatica . token_section
-    (17) token_section -> . token_decl token_section
-    (18) token_section -> .
-    (19) token_decl -> . TERMINAL EQUALS REGEX newlines
-    (20) token_decl -> . TERMINAL EQUALS REGEX
+    (1) init -> program newlines lista_regras . token_section
+    (16) token_section -> . token_decl token_section
+    (17) token_section -> .
+    (18) token_decl -> . TERMINAL EQUALS REGEX newlines
+    (19) token_decl -> . TERMINAL EQUALS REGEX
 
-    $end            reduce using rule 18 (token_section -> .)
-    TERMINAL        shift and go to state 15
+    $end            reduce using rule 17 (token_section -> .)
+    TERMINAL        shift and go to state 14
 
-    token_section                  shift and go to state 13
-    token_decl                     shift and go to state 14
+    token_section                  shift and go to state 12
+    token_decl                     shift and go to state 13
 
 state 8
 
-    (3) gramatica -> lista_regras .
+    (3) lista_regras -> regra . lista_regras
+    (3) lista_regras -> . regra lista_regras
+    (4) lista_regras -> .
+    (5) regra -> . NON_TERMINAL ARROW lista_producoes newlines
+    (6) regra -> . NON_TERMINAL ARROW lista_producoes
 
-    TERMINAL        reduce using rule 3 (gramatica -> lista_regras .)
-    $end            reduce using rule 3 (gramatica -> lista_regras .)
+    TERMINAL        reduce using rule 4 (lista_regras -> .)
+    $end            reduce using rule 4 (lista_regras -> .)
+    NON_TERMINAL    shift and go to state 9
 
+    regra                          shift and go to state 8
+    lista_regras                   shift and go to state 15
 
 state 9
 
-    (4) lista_regras -> regra . lista_regras
-    (4) lista_regras -> . regra lista_regras
-    (5) lista_regras -> .
-    (6) regra -> . NON_TERMINAL ARROW lista_producoes newlines
-    (7) regra -> . NON_TERMINAL ARROW lista_producoes
+    (5) regra -> NON_TERMINAL . ARROW lista_producoes newlines
+    (6) regra -> NON_TERMINAL . ARROW lista_producoes
 
-    TERMINAL        reduce using rule 5 (lista_regras -> .)
-    $end            reduce using rule 5 (lista_regras -> .)
-    NON_TERMINAL    shift and go to state 10
+    ARROW           shift and go to state 16
 
-    regra                          shift and go to state 9
-    lista_regras                   shift and go to state 16
 
 state 10
 
-    (6) regra -> NON_TERMINAL . ARROW lista_producoes newlines
-    (7) regra -> NON_TERMINAL . ARROW lista_producoes
+    (21) newlines -> NEWLINE newlines .
 
-    ARROW           shift and go to state 17
+    NON_TERMINAL    reduce using rule 21 (newlines -> NEWLINE newlines .)
+    TERMINAL        reduce using rule 21 (newlines -> NEWLINE newlines .)
+    $end            reduce using rule 21 (newlines -> NEWLINE newlines .)
 
 
 state 11
-
-    (22) newlines -> NEWLINE newlines .
-
-    NON_TERMINAL    reduce using rule 22 (newlines -> NEWLINE newlines .)
-    TERMINAL        reduce using rule 22 (newlines -> NEWLINE newlines .)
-    $end            reduce using rule 22 (newlines -> NEWLINE newlines .)
-
-
-state 12
 
     (2) program -> PROGRAM COLON NON_TERMINAL .
 
     NEWLINE         reduce using rule 2 (program -> PROGRAM COLON NON_TERMINAL .)
 
 
+state 12
+
+    (1) init -> program newlines lista_regras token_section .
+
+    $end            reduce using rule 1 (init -> program newlines lista_regras token_section .)
+
+
 state 13
 
-    (1) init -> program newlines gramatica token_section .
+    (16) token_section -> token_decl . token_section
+    (16) token_section -> . token_decl token_section
+    (17) token_section -> .
+    (18) token_decl -> . TERMINAL EQUALS REGEX newlines
+    (19) token_decl -> . TERMINAL EQUALS REGEX
 
-    $end            reduce using rule 1 (init -> program newlines gramatica token_section .)
+    $end            reduce using rule 17 (token_section -> .)
+    TERMINAL        shift and go to state 14
 
+    token_decl                     shift and go to state 13
+    token_section                  shift and go to state 17
 
 state 14
 
-    (17) token_section -> token_decl . token_section
-    (17) token_section -> . token_decl token_section
-    (18) token_section -> .
-    (19) token_decl -> . TERMINAL EQUALS REGEX newlines
-    (20) token_decl -> . TERMINAL EQUALS REGEX
+    (18) token_decl -> TERMINAL . EQUALS REGEX newlines
+    (19) token_decl -> TERMINAL . EQUALS REGEX
 
-    $end            reduce using rule 18 (token_section -> .)
-    TERMINAL        shift and go to state 15
+    EQUALS          shift and go to state 18
 
-    token_decl                     shift and go to state 14
-    token_section                  shift and go to state 18
 
 state 15
 
-    (19) token_decl -> TERMINAL . EQUALS REGEX newlines
-    (20) token_decl -> TERMINAL . EQUALS REGEX
+    (3) lista_regras -> regra lista_regras .
 
-    EQUALS          shift and go to state 19
+    TERMINAL        reduce using rule 3 (lista_regras -> regra lista_regras .)
+    $end            reduce using rule 3 (lista_regras -> regra lista_regras .)
 
 
 state 16
 
-    (4) lista_regras -> regra lista_regras .
+    (5) regra -> NON_TERMINAL ARROW . lista_producoes newlines
+    (6) regra -> NON_TERMINAL ARROW . lista_producoes
+    (7) lista_producoes -> . producao lista_producoes_rest
+    (10) producao -> . simbolo lista_simbolos
+    (11) producao -> . EPSILON
+    (14) simbolo -> . TERMINAL
+    (15) simbolo -> . NON_TERMINAL
 
-    TERMINAL        reduce using rule 4 (lista_regras -> regra lista_regras .)
-    $end            reduce using rule 4 (lista_regras -> regra lista_regras .)
+    EPSILON         shift and go to state 23
+    TERMINAL        shift and go to state 24
+    NON_TERMINAL    shift and go to state 19
 
+    lista_producoes                shift and go to state 20
+    producao                       shift and go to state 21
+    simbolo                        shift and go to state 22
 
 state 17
 
-    (6) regra -> NON_TERMINAL ARROW . lista_producoes newlines
-    (7) regra -> NON_TERMINAL ARROW . lista_producoes
-    (8) lista_producoes -> . producao lista_producoes_rest
-    (11) producao -> . simbolo lista_simbolos
-    (12) producao -> . EPSILON
-    (15) simbolo -> . TERMINAL
-    (16) simbolo -> . NON_TERMINAL
+    (16) token_section -> token_decl token_section .
 
-    EPSILON         shift and go to state 24
-    TERMINAL        shift and go to state 25
-    NON_TERMINAL    shift and go to state 20
+    $end            reduce using rule 16 (token_section -> token_decl token_section .)
 
-    lista_producoes                shift and go to state 21
-    producao                       shift and go to state 22
-    simbolo                        shift and go to state 23
 
 state 18
 
-    (17) token_section -> token_decl token_section .
+    (18) token_decl -> TERMINAL EQUALS . REGEX newlines
+    (19) token_decl -> TERMINAL EQUALS . REGEX
 
-    $end            reduce using rule 17 (token_section -> token_decl token_section .)
+    REGEX           shift and go to state 25
 
 
 state 19
 
-    (19) token_decl -> TERMINAL EQUALS . REGEX newlines
-    (20) token_decl -> TERMINAL EQUALS . REGEX
+    (15) simbolo -> NON_TERMINAL .
 
-    REGEX           shift and go to state 26
+    TERMINAL        reduce using rule 15 (simbolo -> NON_TERMINAL .)
+    NON_TERMINAL    reduce using rule 15 (simbolo -> NON_TERMINAL .)
+    PIPE            reduce using rule 15 (simbolo -> NON_TERMINAL .)
+    NEWLINE         reduce using rule 15 (simbolo -> NON_TERMINAL .)
+    $end            reduce using rule 15 (simbolo -> NON_TERMINAL .)
 
 
 state 20
 
-    (16) simbolo -> NON_TERMINAL .
+    (5) regra -> NON_TERMINAL ARROW lista_producoes . newlines
+    (6) regra -> NON_TERMINAL ARROW lista_producoes .
+    (20) newlines -> . NEWLINE
+    (21) newlines -> . NEWLINE newlines
 
-    TERMINAL        reduce using rule 16 (simbolo -> NON_TERMINAL .)
-    NON_TERMINAL    reduce using rule 16 (simbolo -> NON_TERMINAL .)
-    PIPE            reduce using rule 16 (simbolo -> NON_TERMINAL .)
-    NEWLINE         reduce using rule 16 (simbolo -> NON_TERMINAL .)
-    $end            reduce using rule 16 (simbolo -> NON_TERMINAL .)
+    NON_TERMINAL    reduce using rule 6 (regra -> NON_TERMINAL ARROW lista_producoes .)
+    TERMINAL        reduce using rule 6 (regra -> NON_TERMINAL ARROW lista_producoes .)
+    $end            reduce using rule 6 (regra -> NON_TERMINAL ARROW lista_producoes .)
+    NEWLINE         shift and go to state 5
 
+    newlines                       shift and go to state 26
 
 state 21
 
-    (6) regra -> NON_TERMINAL ARROW lista_producoes . newlines
-    (7) regra -> NON_TERMINAL ARROW lista_producoes .
-    (21) newlines -> . NEWLINE
-    (22) newlines -> . NEWLINE newlines
+    (7) lista_producoes -> producao . lista_producoes_rest
+    (8) lista_producoes_rest -> . PIPE producao lista_producoes_rest
+    (9) lista_producoes_rest -> .
 
-    NON_TERMINAL    reduce using rule 7 (regra -> NON_TERMINAL ARROW lista_producoes .)
-    TERMINAL        reduce using rule 7 (regra -> NON_TERMINAL ARROW lista_producoes .)
-    $end            reduce using rule 7 (regra -> NON_TERMINAL ARROW lista_producoes .)
-    NEWLINE         shift and go to state 5
+    PIPE            shift and go to state 28
+    NEWLINE         reduce using rule 9 (lista_producoes_rest -> .)
+    NON_TERMINAL    reduce using rule 9 (lista_producoes_rest -> .)
+    TERMINAL        reduce using rule 9 (lista_producoes_rest -> .)
+    $end            reduce using rule 9 (lista_producoes_rest -> .)
 
-    newlines                       shift and go to state 27
+    lista_producoes_rest           shift and go to state 27
 
 state 22
 
-    (8) lista_producoes -> producao . lista_producoes_rest
-    (9) lista_producoes_rest -> . PIPE producao lista_producoes_rest
-    (10) lista_producoes_rest -> .
-
-    PIPE            shift and go to state 29
-    NEWLINE         reduce using rule 10 (lista_producoes_rest -> .)
-    NON_TERMINAL    reduce using rule 10 (lista_producoes_rest -> .)
-    TERMINAL        reduce using rule 10 (lista_producoes_rest -> .)
-    $end            reduce using rule 10 (lista_producoes_rest -> .)
-
-    lista_producoes_rest           shift and go to state 28
-
-state 23
-
-    (11) producao -> simbolo . lista_simbolos
-    (13) lista_simbolos -> . simbolo lista_simbolos
-    (14) lista_simbolos -> .
-    (15) simbolo -> . TERMINAL
-    (16) simbolo -> . NON_TERMINAL
+    (10) producao -> simbolo . lista_simbolos
+    (12) lista_simbolos -> . simbolo lista_simbolos
+    (13) lista_simbolos -> .
+    (14) simbolo -> . TERMINAL
+    (15) simbolo -> . NON_TERMINAL
 
   ! shift/reduce conflict for TERMINAL resolved as shift
   ! shift/reduce conflict for NON_TERMINAL resolved as shift
-    PIPE            reduce using rule 14 (lista_simbolos -> .)
-    NEWLINE         reduce using rule 14 (lista_simbolos -> .)
-    $end            reduce using rule 14 (lista_simbolos -> .)
-    TERMINAL        shift and go to state 25
-    NON_TERMINAL    shift and go to state 20
+    PIPE            reduce using rule 13 (lista_simbolos -> .)
+    NEWLINE         reduce using rule 13 (lista_simbolos -> .)
+    $end            reduce using rule 13 (lista_simbolos -> .)
+    TERMINAL        shift and go to state 24
+    NON_TERMINAL    shift and go to state 19
 
-  ! NON_TERMINAL    [ reduce using rule 14 (lista_simbolos -> .) ]
-  ! TERMINAL        [ reduce using rule 14 (lista_simbolos -> .) ]
+  ! NON_TERMINAL    [ reduce using rule 13 (lista_simbolos -> .) ]
+  ! TERMINAL        [ reduce using rule 13 (lista_simbolos -> .) ]
 
-    simbolo                        shift and go to state 30
-    lista_simbolos                 shift and go to state 31
+    simbolo                        shift and go to state 29
+    lista_simbolos                 shift and go to state 30
+
+state 23
+
+    (11) producao -> EPSILON .
+
+    PIPE            reduce using rule 11 (producao -> EPSILON .)
+    NEWLINE         reduce using rule 11 (producao -> EPSILON .)
+    NON_TERMINAL    reduce using rule 11 (producao -> EPSILON .)
+    TERMINAL        reduce using rule 11 (producao -> EPSILON .)
+    $end            reduce using rule 11 (producao -> EPSILON .)
+
 
 state 24
 
-    (12) producao -> EPSILON .
+    (14) simbolo -> TERMINAL .
 
-    PIPE            reduce using rule 12 (producao -> EPSILON .)
-    NEWLINE         reduce using rule 12 (producao -> EPSILON .)
-    NON_TERMINAL    reduce using rule 12 (producao -> EPSILON .)
-    TERMINAL        reduce using rule 12 (producao -> EPSILON .)
-    $end            reduce using rule 12 (producao -> EPSILON .)
+    TERMINAL        reduce using rule 14 (simbolo -> TERMINAL .)
+    NON_TERMINAL    reduce using rule 14 (simbolo -> TERMINAL .)
+    PIPE            reduce using rule 14 (simbolo -> TERMINAL .)
+    NEWLINE         reduce using rule 14 (simbolo -> TERMINAL .)
+    $end            reduce using rule 14 (simbolo -> TERMINAL .)
 
 
 state 25
 
-    (15) simbolo -> TERMINAL .
+    (18) token_decl -> TERMINAL EQUALS REGEX . newlines
+    (19) token_decl -> TERMINAL EQUALS REGEX .
+    (20) newlines -> . NEWLINE
+    (21) newlines -> . NEWLINE newlines
 
-    TERMINAL        reduce using rule 15 (simbolo -> TERMINAL .)
-    NON_TERMINAL    reduce using rule 15 (simbolo -> TERMINAL .)
-    PIPE            reduce using rule 15 (simbolo -> TERMINAL .)
-    NEWLINE         reduce using rule 15 (simbolo -> TERMINAL .)
-    $end            reduce using rule 15 (simbolo -> TERMINAL .)
+    TERMINAL        reduce using rule 19 (token_decl -> TERMINAL EQUALS REGEX .)
+    $end            reduce using rule 19 (token_decl -> TERMINAL EQUALS REGEX .)
+    NEWLINE         shift and go to state 5
 
+    newlines                       shift and go to state 31
 
 state 26
 
-    (19) token_decl -> TERMINAL EQUALS REGEX . newlines
-    (20) token_decl -> TERMINAL EQUALS REGEX .
-    (21) newlines -> . NEWLINE
-    (22) newlines -> . NEWLINE newlines
+    (5) regra -> NON_TERMINAL ARROW lista_producoes newlines .
 
-    TERMINAL        reduce using rule 20 (token_decl -> TERMINAL EQUALS REGEX .)
-    $end            reduce using rule 20 (token_decl -> TERMINAL EQUALS REGEX .)
-    NEWLINE         shift and go to state 5
+    NON_TERMINAL    reduce using rule 5 (regra -> NON_TERMINAL ARROW lista_producoes newlines .)
+    TERMINAL        reduce using rule 5 (regra -> NON_TERMINAL ARROW lista_producoes newlines .)
+    $end            reduce using rule 5 (regra -> NON_TERMINAL ARROW lista_producoes newlines .)
 
-    newlines                       shift and go to state 32
 
 state 27
 
-    (6) regra -> NON_TERMINAL ARROW lista_producoes newlines .
+    (7) lista_producoes -> producao lista_producoes_rest .
 
-    NON_TERMINAL    reduce using rule 6 (regra -> NON_TERMINAL ARROW lista_producoes newlines .)
-    TERMINAL        reduce using rule 6 (regra -> NON_TERMINAL ARROW lista_producoes newlines .)
-    $end            reduce using rule 6 (regra -> NON_TERMINAL ARROW lista_producoes newlines .)
+    NEWLINE         reduce using rule 7 (lista_producoes -> producao lista_producoes_rest .)
+    NON_TERMINAL    reduce using rule 7 (lista_producoes -> producao lista_producoes_rest .)
+    TERMINAL        reduce using rule 7 (lista_producoes -> producao lista_producoes_rest .)
+    $end            reduce using rule 7 (lista_producoes -> producao lista_producoes_rest .)
 
 
 state 28
 
-    (8) lista_producoes -> producao lista_producoes_rest .
+    (8) lista_producoes_rest -> PIPE . producao lista_producoes_rest
+    (10) producao -> . simbolo lista_simbolos
+    (11) producao -> . EPSILON
+    (14) simbolo -> . TERMINAL
+    (15) simbolo -> . NON_TERMINAL
 
-    NEWLINE         reduce using rule 8 (lista_producoes -> producao lista_producoes_rest .)
-    NON_TERMINAL    reduce using rule 8 (lista_producoes -> producao lista_producoes_rest .)
-    TERMINAL        reduce using rule 8 (lista_producoes -> producao lista_producoes_rest .)
-    $end            reduce using rule 8 (lista_producoes -> producao lista_producoes_rest .)
+    EPSILON         shift and go to state 23
+    TERMINAL        shift and go to state 24
+    NON_TERMINAL    shift and go to state 19
 
+    producao                       shift and go to state 32
+    simbolo                        shift and go to state 22
 
 state 29
 
-    (9) lista_producoes_rest -> PIPE . producao lista_producoes_rest
-    (11) producao -> . simbolo lista_simbolos
-    (12) producao -> . EPSILON
-    (15) simbolo -> . TERMINAL
-    (16) simbolo -> . NON_TERMINAL
-
-    EPSILON         shift and go to state 24
-    TERMINAL        shift and go to state 25
-    NON_TERMINAL    shift and go to state 20
-
-    producao                       shift and go to state 33
-    simbolo                        shift and go to state 23
-
-state 30
-
-    (13) lista_simbolos -> simbolo . lista_simbolos
-    (13) lista_simbolos -> . simbolo lista_simbolos
-    (14) lista_simbolos -> .
-    (15) simbolo -> . TERMINAL
-    (16) simbolo -> . NON_TERMINAL
+    (12) lista_simbolos -> simbolo . lista_simbolos
+    (12) lista_simbolos -> . simbolo lista_simbolos
+    (13) lista_simbolos -> .
+    (14) simbolo -> . TERMINAL
+    (15) simbolo -> . NON_TERMINAL
 
   ! shift/reduce conflict for TERMINAL resolved as shift
   ! shift/reduce conflict for NON_TERMINAL resolved as shift
-    PIPE            reduce using rule 14 (lista_simbolos -> .)
-    NEWLINE         reduce using rule 14 (lista_simbolos -> .)
-    $end            reduce using rule 14 (lista_simbolos -> .)
-    TERMINAL        shift and go to state 25
-    NON_TERMINAL    shift and go to state 20
+    PIPE            reduce using rule 13 (lista_simbolos -> .)
+    NEWLINE         reduce using rule 13 (lista_simbolos -> .)
+    $end            reduce using rule 13 (lista_simbolos -> .)
+    TERMINAL        shift and go to state 24
+    NON_TERMINAL    shift and go to state 19
 
-  ! NON_TERMINAL    [ reduce using rule 14 (lista_simbolos -> .) ]
-  ! TERMINAL        [ reduce using rule 14 (lista_simbolos -> .) ]
+  ! NON_TERMINAL    [ reduce using rule 13 (lista_simbolos -> .) ]
+  ! TERMINAL        [ reduce using rule 13 (lista_simbolos -> .) ]
 
-    simbolo                        shift and go to state 30
-    lista_simbolos                 shift and go to state 34
+    simbolo                        shift and go to state 29
+    lista_simbolos                 shift and go to state 33
+
+state 30
+
+    (10) producao -> simbolo lista_simbolos .
+
+    PIPE            reduce using rule 10 (producao -> simbolo lista_simbolos .)
+    NEWLINE         reduce using rule 10 (producao -> simbolo lista_simbolos .)
+    NON_TERMINAL    reduce using rule 10 (producao -> simbolo lista_simbolos .)
+    TERMINAL        reduce using rule 10 (producao -> simbolo lista_simbolos .)
+    $end            reduce using rule 10 (producao -> simbolo lista_simbolos .)
+
 
 state 31
 
-    (11) producao -> simbolo lista_simbolos .
+    (18) token_decl -> TERMINAL EQUALS REGEX newlines .
 
-    PIPE            reduce using rule 11 (producao -> simbolo lista_simbolos .)
-    NEWLINE         reduce using rule 11 (producao -> simbolo lista_simbolos .)
-    NON_TERMINAL    reduce using rule 11 (producao -> simbolo lista_simbolos .)
-    TERMINAL        reduce using rule 11 (producao -> simbolo lista_simbolos .)
-    $end            reduce using rule 11 (producao -> simbolo lista_simbolos .)
+    TERMINAL        reduce using rule 18 (token_decl -> TERMINAL EQUALS REGEX newlines .)
+    $end            reduce using rule 18 (token_decl -> TERMINAL EQUALS REGEX newlines .)
 
 
 state 32
 
-    (19) token_decl -> TERMINAL EQUALS REGEX newlines .
+    (8) lista_producoes_rest -> PIPE producao . lista_producoes_rest
+    (8) lista_producoes_rest -> . PIPE producao lista_producoes_rest
+    (9) lista_producoes_rest -> .
 
-    TERMINAL        reduce using rule 19 (token_decl -> TERMINAL EQUALS REGEX newlines .)
-    $end            reduce using rule 19 (token_decl -> TERMINAL EQUALS REGEX newlines .)
+    PIPE            shift and go to state 28
+    NEWLINE         reduce using rule 9 (lista_producoes_rest -> .)
+    NON_TERMINAL    reduce using rule 9 (lista_producoes_rest -> .)
+    TERMINAL        reduce using rule 9 (lista_producoes_rest -> .)
+    $end            reduce using rule 9 (lista_producoes_rest -> .)
 
+    lista_producoes_rest           shift and go to state 34
 
 state 33
 
-    (9) lista_producoes_rest -> PIPE producao . lista_producoes_rest
-    (9) lista_producoes_rest -> . PIPE producao lista_producoes_rest
-    (10) lista_producoes_rest -> .
+    (12) lista_simbolos -> simbolo lista_simbolos .
 
-    PIPE            shift and go to state 29
-    NEWLINE         reduce using rule 10 (lista_producoes_rest -> .)
-    NON_TERMINAL    reduce using rule 10 (lista_producoes_rest -> .)
-    TERMINAL        reduce using rule 10 (lista_producoes_rest -> .)
-    $end            reduce using rule 10 (lista_producoes_rest -> .)
+    PIPE            reduce using rule 12 (lista_simbolos -> simbolo lista_simbolos .)
+    NEWLINE         reduce using rule 12 (lista_simbolos -> simbolo lista_simbolos .)
+    NON_TERMINAL    reduce using rule 12 (lista_simbolos -> simbolo lista_simbolos .)
+    TERMINAL        reduce using rule 12 (lista_simbolos -> simbolo lista_simbolos .)
+    $end            reduce using rule 12 (lista_simbolos -> simbolo lista_simbolos .)
 
-    lista_producoes_rest           shift and go to state 35
 
 state 34
 
-    (13) lista_simbolos -> simbolo lista_simbolos .
+    (8) lista_producoes_rest -> PIPE producao lista_producoes_rest .
 
-    PIPE            reduce using rule 13 (lista_simbolos -> simbolo lista_simbolos .)
-    NEWLINE         reduce using rule 13 (lista_simbolos -> simbolo lista_simbolos .)
-    NON_TERMINAL    reduce using rule 13 (lista_simbolos -> simbolo lista_simbolos .)
-    TERMINAL        reduce using rule 13 (lista_simbolos -> simbolo lista_simbolos .)
-    $end            reduce using rule 13 (lista_simbolos -> simbolo lista_simbolos .)
-
-
-state 35
-
-    (9) lista_producoes_rest -> PIPE producao lista_producoes_rest .
-
-    NEWLINE         reduce using rule 9 (lista_producoes_rest -> PIPE producao lista_producoes_rest .)
-    NON_TERMINAL    reduce using rule 9 (lista_producoes_rest -> PIPE producao lista_producoes_rest .)
-    TERMINAL        reduce using rule 9 (lista_producoes_rest -> PIPE producao lista_producoes_rest .)
-    $end            reduce using rule 9 (lista_producoes_rest -> PIPE producao lista_producoes_rest .)
+    NEWLINE         reduce using rule 8 (lista_producoes_rest -> PIPE producao lista_producoes_rest .)
+    NON_TERMINAL    reduce using rule 8 (lista_producoes_rest -> PIPE producao lista_producoes_rest .)
+    TERMINAL        reduce using rule 8 (lista_producoes_rest -> PIPE producao lista_producoes_rest .)
+    $end            reduce using rule 8 (lista_producoes_rest -> PIPE producao lista_producoes_rest .)
 
 WARNING: 
 WARNING: Conflicts:
 WARNING: 
-WARNING: shift/reduce conflict for TERMINAL in state 23 resolved as shift
-WARNING: shift/reduce conflict for NON_TERMINAL in state 23 resolved as shift
-WARNING: shift/reduce conflict for TERMINAL in state 30 resolved as shift
-WARNING: shift/reduce conflict for NON_TERMINAL in state 30 resolved as shift
+WARNING: shift/reduce conflict for TERMINAL in state 22 resolved as shift
+WARNING: shift/reduce conflict for NON_TERMINAL in state 22 resolved as shift
+WARNING: shift/reduce conflict for TERMINAL in state 29 resolved as shift
+WARNING: shift/reduce conflict for NON_TERMINAL in state 29 resolved as shift
