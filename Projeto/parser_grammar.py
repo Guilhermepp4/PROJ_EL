@@ -1,7 +1,7 @@
 import ply.yacc as yacc
 from my_lexer import lexer, tokens
 from classes_parser import (Init, Regra, Producoes, 
-                            Simbolo, tokenSection, token)
+                            Simbolo, token)
 
 #from classes_parser import Simbolo, Producao, Regra
 
@@ -57,10 +57,6 @@ def p_producao(p):
     p[0] = Producoes(simbolo=p[1], listaSimbolos=p[2])
     #p[0] = [p[1]] + p[2]
 
-def p_producao_epsilon(p):
-    '''producao : EPSILON'''
-    p[0] == Simbolo(simbolo='ε', e_terminal=True)
-    #p[0] = ['ε']
 
 def p_lista_simbolos(p):
     '''lista_simbolos : simbolo lista_simbolos'''
@@ -70,6 +66,11 @@ def p_lista_simbolos(p):
 def p_lista_simbolos_empty(p):
     '''lista_simbolos : '''
     p[0] = []
+
+def p_simbolo_epsilon(p):
+    '''simbolo : EPSILON'''
+    p[0] = Simbolo(simbolo='ε', e_terminal=True)
+    #p[0] = ['ε']
 
 def p_simbolo_term(p):
     '''simbolo : TERMINAL'''

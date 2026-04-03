@@ -12,6 +12,7 @@ Elems -> ε
 Elem -> INT | ID
 
 INT = /[0-9]+/
+ID = /[A-Za-z]+/
 """
 
 

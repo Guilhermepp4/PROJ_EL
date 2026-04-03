@@ -13,9 +13,9 @@ Rule 7     lista_producoes -> producao lista_producoes_rest
 Rule 8     lista_producoes_rest -> PIPE producao lista_producoes_rest
 Rule 9     lista_producoes_rest -> <empty>
 Rule 10    producao -> simbolo lista_simbolos
-Rule 11    producao -> EPSILON
-Rule 12    lista_simbolos -> simbolo lista_simbolos
-Rule 13    lista_simbolos -> <empty>
+Rule 11    lista_simbolos -> simbolo lista_simbolos
+Rule 12    lista_simbolos -> <empty>
+Rule 13    simbolo -> EPSILON
 Rule 14    simbolo -> TERMINAL
 Rule 15    simbolo -> NON_TERMINAL
 Rule 16    token_section -> token_decl token_section
@@ -29,7 +29,7 @@ Terminals, with rules where they appear
 
 ARROW                : 5 6
 COLON                : 2
-EPSILON              : 11
+EPSILON              : 13
 EQUALS               : 18 19
 NEWLINE              : 20 21
 NON_TERMINAL         : 2 5 6 15
@@ -45,12 +45,12 @@ init                 : 0
 lista_producoes      : 5 6
 lista_producoes_rest : 7 8
 lista_regras         : 1 3
-lista_simbolos       : 10 12
+lista_simbolos       : 10 11
 newlines             : 1 5 18 21
 producao             : 7 8
 program              : 1
 regra                : 3
-simbolo              : 10 12
+simbolo              : 10 11
 token_decl           : 16
 token_section        : 1 16
 
@@ -222,7 +222,7 @@ state 16
     (6) regra -> NON_TERMINAL ARROW . lista_producoes
     (7) lista_producoes -> . producao lista_producoes_rest
     (10) producao -> . simbolo lista_simbolos
-    (11) producao -> . EPSILON
+    (13) simbolo -> . EPSILON
     (14) simbolo -> . TERMINAL
     (15) simbolo -> . NON_TERMINAL
 
@@ -253,6 +253,7 @@ state 19
 
     (15) simbolo -> NON_TERMINAL .
 
+    EPSILON         reduce using rule 15 (simbolo -> NON_TERMINAL .)
     TERMINAL        reduce using rule 15 (simbolo -> NON_TERMINAL .)
     NON_TERMINAL    reduce using rule 15 (simbolo -> NON_TERMINAL .)
     PIPE            reduce using rule 15 (simbolo -> NON_TERMINAL .)
@@ -291,40 +292,44 @@ state 21
 state 22
 
     (10) producao -> simbolo . lista_simbolos
-    (12) lista_simbolos -> . simbolo lista_simbolos
-    (13) lista_simbolos -> .
+    (11) lista_simbolos -> . simbolo lista_simbolos
+    (12) lista_simbolos -> .
+    (13) simbolo -> . EPSILON
     (14) simbolo -> . TERMINAL
     (15) simbolo -> . NON_TERMINAL
 
   ! shift/reduce conflict for TERMINAL resolved as shift
   ! shift/reduce conflict for NON_TERMINAL resolved as shift
-    PIPE            reduce using rule 13 (lista_simbolos -> .)
-    NEWLINE         reduce using rule 13 (lista_simbolos -> .)
-    $end            reduce using rule 13 (lista_simbolos -> .)
+    PIPE            reduce using rule 12 (lista_simbolos -> .)
+    NEWLINE         reduce using rule 12 (lista_simbolos -> .)
+    $end            reduce using rule 12 (lista_simbolos -> .)
+    EPSILON         shift and go to state 23
     TERMINAL        shift and go to state 24
     NON_TERMINAL    shift and go to state 19
 
-  ! NON_TERMINAL    [ reduce using rule 13 (lista_simbolos -> .) ]
-  ! TERMINAL        [ reduce using rule 13 (lista_simbolos -> .) ]
+  ! NON_TERMINAL    [ reduce using rule 12 (lista_simbolos -> .) ]
+  ! TERMINAL        [ reduce using rule 12 (lista_simbolos -> .) ]
 
     simbolo                        shift and go to state 29
     lista_simbolos                 shift and go to state 30
 
 state 23
 
-    (11) producao -> EPSILON .
+    (13) simbolo -> EPSILON .
 
-    PIPE            reduce using rule 11 (producao -> EPSILON .)
-    NEWLINE         reduce using rule 11 (producao -> EPSILON .)
-    NON_TERMINAL    reduce using rule 11 (producao -> EPSILON .)
-    TERMINAL        reduce using rule 11 (producao -> EPSILON .)
-    $end            reduce using rule 11 (producao -> EPSILON .)
+    EPSILON         reduce using rule 13 (simbolo -> EPSILON .)
+    TERMINAL        reduce using rule 13 (simbolo -> EPSILON .)
+    NON_TERMINAL    reduce using rule 13 (simbolo -> EPSILON .)
+    PIPE            reduce using rule 13 (simbolo -> EPSILON .)
+    NEWLINE         reduce using rule 13 (simbolo -> EPSILON .)
+    $end            reduce using rule 13 (simbolo -> EPSILON .)
 
 
 state 24
 
     (14) simbolo -> TERMINAL .
 
+    EPSILON         reduce using rule 14 (simbolo -> TERMINAL .)
     TERMINAL        reduce using rule 14 (simbolo -> TERMINAL .)
     NON_TERMINAL    reduce using rule 14 (simbolo -> TERMINAL .)
     PIPE            reduce using rule 14 (simbolo -> TERMINAL .)
@@ -368,7 +373,7 @@ state 28
 
     (8) lista_producoes_rest -> PIPE . producao lista_producoes_rest
     (10) producao -> . simbolo lista_simbolos
-    (11) producao -> . EPSILON
+    (13) simbolo -> . EPSILON
     (14) simbolo -> . TERMINAL
     (15) simbolo -> . NON_TERMINAL
 
@@ -381,22 +386,24 @@ state 28
 
 state 29
 
-    (12) lista_simbolos -> simbolo . lista_simbolos
-    (12) lista_simbolos -> . simbolo lista_simbolos
-    (13) lista_simbolos -> .
+    (11) lista_simbolos -> simbolo . lista_simbolos
+    (11) lista_simbolos -> . simbolo lista_simbolos
+    (12) lista_simbolos -> .
+    (13) simbolo -> . EPSILON
     (14) simbolo -> . TERMINAL
     (15) simbolo -> . NON_TERMINAL
 
   ! shift/reduce conflict for TERMINAL resolved as shift
   ! shift/reduce conflict for NON_TERMINAL resolved as shift
-    PIPE            reduce using rule 13 (lista_simbolos -> .)
-    NEWLINE         reduce using rule 13 (lista_simbolos -> .)
-    $end            reduce using rule 13 (lista_simbolos -> .)
+    PIPE            reduce using rule 12 (lista_simbolos -> .)
+    NEWLINE         reduce using rule 12 (lista_simbolos -> .)
+    $end            reduce using rule 12 (lista_simbolos -> .)
+    EPSILON         shift and go to state 23
     TERMINAL        shift and go to state 24
     NON_TERMINAL    shift and go to state 19
 
-  ! NON_TERMINAL    [ reduce using rule 13 (lista_simbolos -> .) ]
-  ! TERMINAL        [ reduce using rule 13 (lista_simbolos -> .) ]
+  ! NON_TERMINAL    [ reduce using rule 12 (lista_simbolos -> .) ]
+  ! TERMINAL        [ reduce using rule 12 (lista_simbolos -> .) ]
 
     simbolo                        shift and go to state 29
     lista_simbolos                 shift and go to state 33
@@ -436,13 +443,13 @@ state 32
 
 state 33
 
-    (12) lista_simbolos -> simbolo lista_simbolos .
+    (11) lista_simbolos -> simbolo lista_simbolos .
 
-    PIPE            reduce using rule 12 (lista_simbolos -> simbolo lista_simbolos .)
-    NEWLINE         reduce using rule 12 (lista_simbolos -> simbolo lista_simbolos .)
-    NON_TERMINAL    reduce using rule 12 (lista_simbolos -> simbolo lista_simbolos .)
-    TERMINAL        reduce using rule 12 (lista_simbolos -> simbolo lista_simbolos .)
-    $end            reduce using rule 12 (lista_simbolos -> simbolo lista_simbolos .)
+    PIPE            reduce using rule 11 (lista_simbolos -> simbolo lista_simbolos .)
+    NEWLINE         reduce using rule 11 (lista_simbolos -> simbolo lista_simbolos .)
+    NON_TERMINAL    reduce using rule 11 (lista_simbolos -> simbolo lista_simbolos .)
+    TERMINAL        reduce using rule 11 (lista_simbolos -> simbolo lista_simbolos .)
+    $end            reduce using rule 11 (lista_simbolos -> simbolo lista_simbolos .)
 
 
 state 34

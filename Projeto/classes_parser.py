@@ -13,9 +13,9 @@ class Init(Node):
         new_prefix = prefix + "    "
 
         if self.regras == []:
-            print(new_prefix + f"└── {self.axioma}")
+            print(new_prefix + f"└── Axioma: {self.axioma}")
         else:
-            print(new_prefix + f"├── {self.axioma}")
+            print(new_prefix + f"├── Axioma: {self.axioma}")
         
         # Imprimir as regras
         if isinstance(self.regras, list):
@@ -25,9 +25,11 @@ class Init(Node):
             
         # Imprimir os tokens
         if isinstance(self.tokens, list):
-            for t in self.tokens: t.print_tree(new_prefix, True)
+            for i, t in enumerate(self.tokens):
+                last = (i == len(self.tokens) - 1)
+                t.print_tree(prefix, last)
         elif self.tokens:
-            self.tokens.print_tree(new_prefix, True)
+            self.tokens.print_tree(prefix, True)
         
 
 class Regra(Node):
@@ -37,7 +39,7 @@ class Regra(Node):
     
     def print_tree(self, prefix="", is_last=True):
         conector = "└── " if is_last else "├── "
-        print(prefix + conector + f"{self.cabeca}")
+        print(prefix + conector + "Regra: "+ f"{self.cabeca}")
         
         # Verifica se producoes não é None e se é uma lista
         if self.producoes is not None:
@@ -47,9 +49,6 @@ class Regra(Node):
                     if p is not None:
                         last = (i == len(self.producoes) - 1)
                         p.print_tree(prefix + "    ", last)
-            else:
-                self.producoes.print_tree(prefix + "    ", True)
-
 
 class Producoes(Node):
     def __init__(self, simbolo, listaSimbolos):
@@ -57,20 +56,24 @@ class Producoes(Node):
         self.listaSimbolos = listaSimbolos
     
     def print_tree(self, prefix="", is_last=True):
-        # 1. Imprime o primeiro símbolo
-        # Se houver mais símbolos na lista, este não é o último (is_last=False)
-        tem_mais = len(self.listaSimbolos) > 0
-        self.simbolo.print_tree(prefix, not tem_mais)
+        # 1. Primeiro, imprimimos o "contentor" da produção
+        conector = "└── " if is_last else "├── "
+        print(prefix + conector + "Produção")
         
-        # 2. Imprime o resto dos símbolos da lista
+        prefixo_filhos = prefix + ("    " if is_last else "│   ")
+        
+        # 3. Imprimimos o primeiro símbolo (p[1] do parser)
+        tem_mais = len(self.listaSimbolos) > 0
+        self.simbolo.print_tree(prefixo_filhos, not tem_mais)
+        
+        # 4. Imprimimos o resto dos símbolos (p[2] do parser)
         for i, s in enumerate(self.listaSimbolos):
             ultimo_da_lista = (i == len(self.listaSimbolos) - 1)
-            if isinstance(s, Node):
-                s.print_tree(prefix, ultimo_da_lista)
+            if hasattr(s, 'print_tree'):
+                s.print_tree(prefixo_filhos, ultimo_da_lista)
             else:
-                # Caso o símbolo seja apenas uma string (segurança)
-                conector = "└── " if ultimo_da_lista else "├── "
-                print(prefix + conector + str(s))
+                conector_s = "└── " if ultimo_da_lista else "├── "
+                print(prefixo_filhos + conector_s + str(s))
 
 class Simbolo(Node):
     def __init__(self, simbolo, e_terminal):
@@ -81,11 +84,6 @@ class Simbolo(Node):
         conector = "└── " if is_last else "├── "
         tipo = "T" if self.e_terminal else "NT"
         print(prefix + conector + f"{tipo}: {self.simbolo}")
-
-class tokenSection:
-    def __init__(self, tokenDecl, producoes):
-        self.tokenDecl = tokenDecl
-        self.producoes = producoes
 
 class token(Node):
     def __init__(self, simbolo, regex):
