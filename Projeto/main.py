@@ -2,19 +2,28 @@ import sys
 import os
 from parser_grammar import parser_gram
 import time
-from first_follow import compute_first, compute_follow
+from first_follow import compute_first, compute_follow, print_sets
 
-GRAMMAR_EXAMPLE = """\
-Program : Lista
-
-Lista -> '[' Elems ']'
-Elems -> ε
-    | Elem ',' Elems
-Elem -> INT | ID
-
-INT = /[0-9]+/
-ID = /[A-Za-z]+/
+GRAMMAR_EXAMPLE = """
+Program : E
+E  -> T E_Prime
+E_Prime -> '+' T E_Prime | ε
+T  -> F T_Prime
+T_Prime -> '*' F T_Prime | ε
+F  -> '(' E ')' | ID
 """
+
+# GRAMMAR_EXAMPLE = """\
+# Program : Lista
+
+# Lista -> '[' Elems ']'
+# Elems -> ε
+#     | Elem ',' Elems
+# Elem -> INT | ID
+
+# INT = /[0-9]+/
+# ID = /[A-Za-z]+/
+# """
 YELLOW = "\033[93m"
 
 
@@ -46,8 +55,8 @@ def exec_pipeline(info):
     
     print("\n2º PASSO - Calcular Fisrt e o Follow\n")
     first = compute_first(resultado_ast)
-    print(first)
-    #follow = compute_follow(resultado_ast)
+    follow = compute_follow(first, resultado_ast)
+    print_sets(first, follow)
 
 
 
