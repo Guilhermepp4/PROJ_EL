@@ -1,7 +1,8 @@
 import sys
 import os
 from parser_grammar import parser_gram
-import pprint
+import time
+from first_follow import compute_first, compute_follow
 
 GRAMMAR_EXAMPLE = """\
 Program : Lista
@@ -14,21 +15,40 @@ Elem -> INT | ID
 INT = /[0-9]+/
 ID = /[A-Za-z]+/
 """
+YELLOW = "\033[93m"
+
+
+def processarAST(info):
+    print("-------- A processar gramática --------")
+    resultado_ast = parser_gram(info)
+    
+    if resultado_ast:
+        print("\n ✅ Gramática processada com sucesso")
+        print("\nAST (Estrutura de Dados):")
+        resultado_ast.print_tree()
+        
+        print(f"\nSimbolo inicial: {resultado_ast.get_inicial()}")
+        print(f"Não Terminais: [{' - '.join(sorted(resultado_ast.get_nonterminals()))}]")
+        print(f"Terminais:  [{' - '.join(sorted(resultado_ast.get_Terminals()))}]")
+        print(f"Tokens: {resultado_ast.get_token()}")
+
+    else:
+        print("🚨 Erro: O parser não devolveu resultados 🚨")
+
+    return resultado_ast
 
 
 def exec_pipeline(info):
     print("Welcome to Grammar Playground\n")
+    #time.sleep(1)
     print("1º PASSO - Desenvolver AST\n")
-
-    print("\n--- A processar gramática ---")
-    resultado_ast = parser_gram(info)
+    resultado_ast = processarAST(info)
     
-    if resultado_ast:
-        print("\nAST (Estrutura de Dados):")
-        resultado_ast.print_tree()
+    print("\n2º PASSO - Calcular Fisrt e o Follow\n")
+    first = compute_first(resultado_ast)
+    print(first)
+    #follow = compute_follow(resultado_ast)
 
-    else:
-        print("Erro: O parser não devolveu resultados.")
 
 
 if __name__ == '__main__':
@@ -46,7 +66,12 @@ if __name__ == '__main__':
         exec_pipeline(info)
 
     else:
-        print("Não foi detetada nenhuma gramática\n")
+        print("❌ Não foi detetada nenhuma gramática ❌")
         print("Processar a gramática de exemplo\n") 
+        
+        # for i in range(3):
+        #     print(".", end="", flush=True)
+        #     time.sleep(1)
+        
         exec_pipeline(GRAMMAR_EXAMPLE)  
     

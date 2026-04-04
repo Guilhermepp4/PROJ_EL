@@ -30,7 +30,36 @@ class Init(Node):
                 t.print_tree(prefix, last)
         elif self.tokens:
             self.tokens.print_tree(prefix, True)
-        
+    
+    def get_inicial(self):
+        return self.axioma
+
+    def get_nonterminals(self):
+        non_terms = set()
+        for r in self.regras:
+            valor = r.cabeca.simbolo if hasattr(r.cabeca, 'simbolo') else r.cabeca
+            non_terms.add(valor)
+        return list(non_terms)
+    
+    def get_Terminals(self): # Notei que no teu erro chamaste get_Terminals com T maiúsculo
+            terminals = set()
+            for r in self.regras:
+                for prod in r.producoes:
+                    if hasattr(prod.simbolo, 'e_terminal') and prod.simbolo.e_terminal:
+                            terminals.add(prod.simbolo.simbolo)
+                    
+                    
+                    for s in prod.listaSimbolos:
+                        if hasattr(s, 'e_terminal') and s.e_terminal:
+                            terminals.add(s.simbolo)
+            return list(terminals)
+
+    def get_token(self):
+        patterns = {}
+        for t in self.tokens:
+            nome = t.simbolo.simbolo if hasattr(t.simbolo, 'simbolo') else t.simbolo
+            patterns[nome] = t.regex
+        return patterns
 
 class Regra(Node):
     def __init__(self, cabeca, producoes):
@@ -84,6 +113,9 @@ class Simbolo(Node):
         conector = "└── " if is_last else "├── "
         tipo = "T" if self.e_terminal else "NT"
         print(prefix + conector + f"{tipo}: {self.simbolo}")
+    
+    def is_epsilon(self):
+        return self.simbolo == 'ε'
 
 class token(Node):
     def __init__(self, simbolo, regex):

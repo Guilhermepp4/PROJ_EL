@@ -3,8 +3,6 @@ from my_lexer import lexer, tokens
 from classes_parser import (Init, Regra, Producoes, 
                             Simbolo, token)
 
-#from classes_parser import Simbolo, Producao, Regra
-
 # --- PARSER (Monta a AST) ---
 def p_init(p):
     '''init : program newlines lista_regras token_section'''
@@ -17,7 +15,6 @@ def p_program(p):
 
 def p_lista_regras(p):
     '''lista_regras : regra lista_regras'''
-    # Junta a regra atual com a lista que vem da recursividade
     #p[0] = Lista_Regra(cabeca = p[1], producoes = p[2])
     p[0] = [p[1]] + p[2]
 
@@ -37,13 +34,11 @@ def p_regra_sem_newLine(p):
 
 def p_lista_producoes(p):
     '''lista_producoes : producao lista_producoes_rest'''
-    # p[1] é a primeira produção, p[2] é a lista das outras (após os PIPES)
     #p[0] = Lista_Producoes(cabeca=p[1], producoes=p[2])
     p[0] = [p[1]] + p[2]
 
 def p_lista_producoes_rest(p):
     '''lista_producoes_rest : PIPE producao lista_producoes_rest'''
-    # Importante: p[2] é a produção, p[3] é o resto da lista
     #p[0] = Lista_Producoes(cabeca=p[2], producoes=p[3])
     p[0] = [p[2]] + p[3]
 
@@ -53,7 +48,6 @@ def p_lista_producoes_rest_empty(p):
 
 def p_producao(p):
     '''producao : simbolo lista_simbolos'''
-    # Cria a Produção com todos os símbolos juntos
     p[0] = Producoes(simbolo=p[1], listaSimbolos=p[2])
     #p[0] = [p[1]] + p[2]
 
@@ -93,7 +87,6 @@ def p_token_section_empty(p):
 
 def p_token_newline(p):
     """token_decl : TERMINAL EQUALS REGEX newlines"""
-    # Retorna os dados do token (ex: um tuplo ou objeto)
     s_name = Simbolo(simbolo=p[1], e_terminal=True)
     p[0] = token(simbolo=s_name, regex=p[3])
     #p[0] = (p[1], p[3])
