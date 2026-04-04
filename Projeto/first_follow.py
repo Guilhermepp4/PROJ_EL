@@ -50,6 +50,25 @@ def rool_seq(first, aux_seq, name_s):
     processar_simbolo(first, aux_seq, name_s, result)
     return result
 
+def simple_sequencia(sequencia, A, first, follow):
+    changed = False
+    for i, seq in enumerate(sequencia):
+        if not seq.e_terminal:
+            prev_len = len(follow[seq.simbolo])
+            aux_seq = sequencia[i+1:]
+
+            aux_first = rool_seq(first, aux_seq, seq.simbolo)
+            follow[seq.simbolo] |= (aux_first - {'ε'})
+
+            if 'ε' in aux_first:
+                follow[seq.simbolo] |= follow[A]
+            
+            if prev_len != len(follow[seq.simbolo]):
+                changed = True
+    
+    return changed
+
+
 def compute_follow(first, gramatica):
     follow = {nt : set() for nt in gramatica.get_nonterminals()}
 
@@ -60,22 +79,9 @@ def compute_follow(first, gramatica):
             A = regra.cabeca
             for prod in regra.producoes:
                 sequencia = [prod.simbolo] + prod.listaSimbolos
-                for i, seq in enumerate(sequencia):
-                    if not seq.e_terminal:
-                        prev_len = len(follow[seq.simbolo])
-                        aux_seq = sequencia[i+1:]
-
-                        aux_first = rool_seq(first, aux_seq, seq.simbolo)
-                        follow[seq.simbolo] |= (aux_first - {'ε'})
-
-                        if 'ε' in aux_first:
-                            follow[seq.simbolo] |= follow[A]
-                        
-                        if prev_len != len(follow[seq.simbolo]):
-                            changed = True
-
+                if simple_sequencia(sequencia, A, first, follow):
+                    changed = True
     return follow
-
 
 def print_sets(first, follow):
     print("\n" + "="*60)
