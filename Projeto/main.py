@@ -2,16 +2,16 @@ import sys
 import os
 from parser_grammar import parser_gram
 import time
-from first_follow import compute_first, compute_follow, print_sets
+from first_follow import *
 
-GRAMMAR_EXAMPLE = """
-Program : E
-E  -> T E_Prime
-E_Prime -> '+' T E_Prime | ε
-T  -> F T_Prime
-T_Prime -> '*' F T_Prime | ε
-F  -> '(' E ')' | ID
-"""
+# GRAMMAR_EXAMPLE = """
+# Program : S
+# S -> '0' S '0'
+#      | '1' S '1'
+#      | '0'
+#      | '1'
+#      | 'ε'
+# """
 
 # GRAMMAR_EXAMPLE = """\
 # Program : Lista
@@ -24,8 +24,18 @@ F  -> '(' E ')' | ID
 # INT = /[0-9]+/
 # ID = /[A-Za-z]+/
 # """
-YELLOW = "\033[93m"
 
+GRAMMAR_EXAMPLE = """
+Program : S
+S -> A | B
+A -> 'id' '==' 'number'
+B -> 'id' '=' 'number'
+C -> C '+' 'number' | 'number'
+D -> 'if' E 'then' F
+E -> 'bool'
+F -> 'stmt' G
+G -> 'else' 'stmt' | ε
+"""
 
 def processarAST(info):
     print("-------- A processar gramática --------")
@@ -57,6 +67,19 @@ def exec_pipeline(info):
     first = compute_first(resultado_ast)
     follow = compute_follow(first, resultado_ast)
     print_sets(first, follow)
+    tabela, lista_conflitos = lookahead(resultado_ast, first, follow)
+
+    if lista_conflitos:
+        print("🚨 A gramática possui conflitos:")
+        for c in lista_conflitos:
+            print(f" - {c}")
+        sugestoes= sugerir_correcoes(lista_conflitos)
+        for sugestao in sugestoes:
+            print(sugestao)
+    
+    else:
+        print_tabela(tabela)
+        print("✅ Gramática LL(1) válida!")
 
 
 
