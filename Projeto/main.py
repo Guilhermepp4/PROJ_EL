@@ -13,29 +13,24 @@ from first_follow import *
 #      | 'ε'
 # """
 
-# GRAMMAR_EXAMPLE = """\
-# Program : Lista
+GRAMMAR_EXAMPLE = """\
+Program : Lista
 
-# Lista -> '[' Elems ']'
-# Elems -> ε
-#     | Elem ',' Elems
-# Elem -> INT | ID
+Lista -> '[' Elems ']'
+Elems -> ε
+    | Elem ',' Elems
+Elem -> INT | ID
 
-# INT = /[0-9]+/
-# ID = /[A-Za-z]+/
-# """
-
-GRAMMAR_EXAMPLE = """
-Program : S
-S -> A | B
-A -> 'id' '==' 'number'
-B -> 'id' '=' 'number'
-C -> C '+' 'number' | 'number'
-D -> 'if' E 'then' F
-E -> 'bool'
-F -> 'stmt' G
-G -> 'else' 'stmt' | ε
+INT = /[0-9]+/
+ID = /[A-Za-z]+/
 """
+
+# GRAMMAR_EXAMPLE = """
+# Program : S
+# S -> Stmt
+# Stmt -> 'if' 'cond' 'then' Stmt ElsePart | 'other'
+# ElsePart -> 'else' Stmt | ε
+# """
 
 def processarAST(info):
     print("-------- A processar gramática --------")
@@ -67,16 +62,14 @@ def exec_pipeline(info):
     first = compute_first(resultado_ast)
     follow = compute_follow(first, resultado_ast)
     print_sets(first, follow)
-    tabela, lista_conflitos = lookahead(resultado_ast, first, follow)
 
+    print("\n3º PASSO - Verificar se é LL(1)")
+    tabela, lista_conflitos = lookahead(resultado_ast, first, follow)
     if lista_conflitos:
         print("🚨 A gramática possui conflitos:")
-        for c in lista_conflitos:
-            print(f" - {c}")
-        sugestoes= sugerir_correcoes(lista_conflitos)
+        sugestoes = sugerir_correcoes(first, follow, lista_conflitos, resultado_ast)
         for sugestao in sugestoes:
             print(sugestao)
-    
     else:
         print_tabela(tabela)
         print("✅ Gramática LL(1) válida!")

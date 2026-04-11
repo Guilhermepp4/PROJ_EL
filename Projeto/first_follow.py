@@ -150,117 +150,148 @@ def print_tabela(tabela):
         for t, prod in caminhos.items():
             print(f"M[{nt}, {t}] = {prod}")
 
-def sugerir_correcoes(conflitos_detetados):
-    sugestoes = set()
+def rFatorizacao(first, nt, producoes, gramatica):
+    # Dicionário para agrupar que produções são ativadas por cada terminal
+    # grupos = { 'id': [Producao(A), Producao(B)], ... }
+    grupos = {}
+
+    for p in producoes:
+        # Calculamos o FIRST da sequência (ex: FIRST de 'A')
+        sequencia = [p.simbolo] + p.listaSimbolos
+        f_seq = rool_seq(first, sequencia, nt)
+        
+        for terminal in f_seq:
+            if terminal == 'ε': continue
+            if terminal not in grupos: 
+                grupos[terminal] = []
+            grupos[terminal].append(p)
+
+    # Procuramos onde houve colisão (mais de uma produção para o mesmo terminal)
+    for terminal_conflito, conflito in grupos.items():
+
+        if len(conflito) > 1:
+            
+            nt_prime = f"{nt}_Prime"
+            # A nova regra base começa com o terminal que causou o conflito
+            regra_base = f"{nt} -> {terminal_conflito} {nt_prime}"
+            
+            novas_opcoes_sufixo = []
+            
+            for p in conflito:
+                # Se a produção for um NT (ex: S -> A), temos de ir buscar o "resto" de A
+                # depois de tirarmos o 'id'
+                if not p.simbolo.e_terminal:
+                    regra_interna = next((r for r in gramatica.regras if r.cabeca == p.simbolo.simbolo), None)
+                    if regra_interna:
+                        for p_interna in regra_interna.producoes:
+
+                            # Se a regra interna (A) começa com o nosso terminal...
+                            seq = [p_interna.simbolo] + p_interna.listaSimbolos
+                            if terminal_conflito in rool_seq(first, seq, p.simbolo.simbolo):
+                                
+                                # O sufixo é tudo o que vem depois do primeiro símbolo de A
+                                sufixo = " ".join([s.simbolo for s in p_interna.listaSimbolos])
+                                novas_opcoes_sufixo.append(sufixo if sufixo else "ε")
+                else:
+                    # Se era um terminal direto (ex: S -> 'id' '=='), o sufixo é p.listaSimbolos
+                    sufixo = " ".join([s.simbolo for s in p.listaSimbolos])
+                    novas_opcoes_sufixo.append(sufixo if sufixo else "ε")
+
+            regra_derivada = f"{nt_prime} -> {' | '.join(dict.fromkeys(novas_opcoes_sufixo))}"
+            return [regra_base, regra_derivada]
+
+    return None
+
+def rRecursao(nt_name, producoes):
+    recursivas = []
+    non_recursivas = []
+    for prod in producoes:
+        if prod.simbolo.simbolo == nt_name:
+            recursivas.append(prod.listaSimbolos)
+        else:
+            non_recursivas.append(prod.listaSimbolos)
+        
+    if not recursivas:
+        return "None"
+    
+    nt_prime = f"{nt_name}'"
+    
+    # Nova Regra 1: A -> beta A'
+    nova_regra_A = f"{nt_name} -> " + " | ".join([" ".join([s.simbolo for s in seq]) + f" {nt_prime}" for seq in non_recursivas])
+    
+    # Nova Regra 2: A' -> alpha A' | ε
+    nova_regra_A_prime = f"{nt_prime} -> " + " | ".join([" ".join([s.simbolo for s in seq]) + f" {nt_prime}" for seq in recursivas]) + " | ε"
+    
+    return [nova_regra_A, nova_regra_A_prime]
+
+def rFirstFollow(first, follow, nt, producoes):
+    # Encontrar qual a produção que é anulável (tem ε no FIRST)
+    prod_anulavel = None
+    outras_prods = []
+    
+    for p in producoes:
+        sequencia = [p.simbolo] + p.listaSimbolos
+        if 'ε' in rool_seq(first, sequencia, nt):
+            prod_anulavel = p
+        else:
+            outras_prods.append(p)
+            
+    if not prod_anulavel:
+        return None
+
+    # O conflito acontece com símbolos que estão no FOLLOW de 'nt'
+    # e também no FIRST das outras produções
+    terminais_conflito = set()
+    for p in outras_prods:
+        f_seq = rool_seq(first, [p.simbolo] + p.listaSimbolos, nt)
+        conflito = f_seq.intersection(follow[nt])
+        if conflito:
+            terminais_conflito.update(conflito)
+
+    if terminais_conflito:
+        term_str = ", ".join(list(terminais_conflito))
+        
+        # Sugestão qualitativa: reestruturar para evitar a ambiguidade
+        res = [
+            f"⚠️ Conflito FIRST/FOLLOW no símbolo '{term_str}'",
+            f"Dica: A regra '{nt}' pode ser vazia, mas o que vem a seguir também começa com '{term_str}'.",
+            f"Sugestão: Tenta explicitamente incluir o caso de '{term_str}' na regra '{nt}' ou subir esse símbolo na hierarquia."
+        ]
+        return res
+    
+    return None
+
+def sugerir_correcoes(first, follow, conflitos_detetados, gramatica):
+    sugestoes = []
+    problemNts = set()
     for c in conflitos_detetados:
         partes = c.split(" | ")
         tipo = partes[0]
+        nt_prob = partes[1]
 
+        if nt_prob in problemNts: continue
+        problemNts.add(nt_prob) 
+
+        regra_prob = next((r for r in gramatica.regras if r.cabeca == nt_prob) ,None)
         if tipo == "FIRST/FIRST":
-            nt , simbolo, regras = partes[1], partes[2], partes[3]
-            sugestoes.add(f"💡 No Não-Terminal '{nt}', o símbolo '{simbolo}' inicia duas regras: [{regras}].\n"+
-                             "👉 Sugestão: Tenta aplicar Fatorização a Esquerda\n")
+            corrigida = rFatorizacao(first, nt_prob, regra_prob.producoes, gramatica)
+            if corrigida:
+                sugestoes.append({
+                    'Título': f"Fatorização necessária em {nt_prob}",
+                    'Correção': corrigida
+                })
         elif tipo == "FIRST/FOLLOW":
-            nt, simbolo, regras = partes[1], partes[2], partes[3]
-            sugestoes.add(f"💡 No Não-Terminal '{nt}', o símbolo '{simbolo}' pode vir do FOLLOW ou de uma regra alternativa: [{regras}].\n"
-                          f"👉 Sugestão: Verifica se a gramática é ambígua ou se podes reestruturar o símbolo '{nt}'.")
+            corrigida = rFirstFollow(first, follow, nt_prob, regra_prob.producoes)
+            if corrigida:
+                sugestoes.append({
+                    'Título': f"Ambiguidade FIRST/FOLLOW em {nt_prob}",
+                    'Correção': corrigida
+                })
         elif tipo == "REQ/ESQ":
-            nt, regra = partes[1], partes[2]
-            sugestoes.add(f"💡 O Não-Terminal '{nt}' chama-se a si próprio na regra '{regra}'.\n"+
-                          f"👉 Sugestão: Substitui a recursão à esquerda por recursão à direita.\n")
+            corrigida = rRecursao(nt_prob, regra_prob.producoes)
+            if corrigida:
+                sugestoes.append({
+                    'Título': f"Recursão à esquerda em {nt_prob}",
+                    'Correção': corrigida
+                })
     return sugestoes
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def _first_of_seq(symbols, first_map, nts, result):
-    if not symbols:
-        result.add('ε')
-        return True
-    for sym in symbols:
-        if sym == 'ε':
-            result.add('ε')
-            return True
-        elif not sym.get_is_terminal() and sym.get_value() in nts:
-            sym_first = first_map.get(sym.get_value(), set())
-            result |= (sym_first - {'ε'})
-            if 'ε' not in sym_first:
-                return False
-        else:
-            result.add(sym.get_value())
-            return False
-    result.add('ε')
-    return True
-
-
-def first_of_seq(symbols, first_map, nts):
-    result = set()
-    _first_of_seq(symbols, first_map, nts, result)
-    return result
-
-def build_parse_table(grammar, first, follow):
-    nts = grammar.get_nonterminals()
-    table = {}
-    for rule in grammar.regras:
-        A = rule.cabeca
-        for seq in rule.producoes:
-            seq_first = first_of_seq(seq.simbolo, first, nts)
-            for terminal in seq_first - {'ε'}:
-                cell = table.setdefault((A, terminal), [])
-                if not any(s is seq for s in cell):
-                    cell.append(seq)
-            if 'ε' in seq_first:
-                for terminal in follow[A]:
-                    cell = table.setdefault((A, terminal), [])
-                    if not any(s is seq for s in cell):
-                        cell.append(seq)
-    return table
-
-def print_parse_table(table, grammar):
-    nts   = sorted(grammar.get_nonterminals())
-    terms = sorted(grammar.get_terminals() | {'$'})
-    col_w = max(12, max(len(t) for t in terms) + 2)
-    row_w = max(len(nt) for nt in nts) + 2
-    header = f"{'':>{row_w}}" + ''.join(f"{t:^{col_w}}" for t in terms)
-    print(header)
-    print("─" * len(header))
-    for nt in nts:
-        row = f"{nt:>{row_w}}"
-        for t in terms:
-            cell = table.get((nt, t), [])
-            if not cell:
-                row += f"{'':^{col_w}}"
-            elif len(cell) == 1:
-                s = f"{nt}→{repr(cell[0])}"
-                if len(s) > col_w - 1:
-                    s = s[:col_w - 4] + '...'
-                row += f"{s:^{col_w}}"
-            else:
-                row += f"{'[CONFLITO]':^{col_w}}"
-        print(row)
