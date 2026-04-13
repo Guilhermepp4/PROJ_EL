@@ -4,26 +4,26 @@ from parser_grammar import parser_gram
 import time
 from first_follow import *
 
-# GRAMMAR_EXAMPLE = """
-# Program : S
-# S -> '0' S '0'
-#      | '1' S '1'
-#      | '0'
-#      | '1'
-#      | 'ε'
-# """
-
-GRAMMAR_EXAMPLE = """\
-Program : Lista
-
-Lista -> '[' Elems ']'
-Elems -> ε
-    | Elem ',' Elems
-Elem -> INT | ID
-
-INT = /[0-9]+/
-ID = /[A-Za-z]+/
+GRAMMAR_EXAMPLE = """
+Program : S
+S -> '0' S '0'
+     | '1' S '1'
+     | '0'
+     | '1'
+     | 'ε'
 """
+
+# GRAMMAR_EXAMPLE = """\
+# Program : Lista
+
+# Lista -> '[' Elems ']'
+# Elems -> ε
+#     | Elem ',' Elems
+# Elem -> INT | ID
+
+# INT = /[0-9]+/
+# ID = /[A-Za-z]+/
+# """
 
 # GRAMMAR_EXAMPLE = """
 # Program : S
@@ -51,10 +51,24 @@ def processarAST(info):
 
     return resultado_ast
 
+def conflitos(tabela, lista_conflitos, first, follow, resultado_ast):
+    if lista_conflitos:
+        print(lista_conflitos)
+        print("🚨 A gramática possui conflitos:")
+        sugestoes = sugerir_correcoes(first, follow, lista_conflitos, resultado_ast)
+        for sug in sugestoes:
+            print(f"Sugestão para {sug['tipo_real']}: {sug['titulo']}")
+            for linha in sug['proposta']:
+                print(f"  -> {linha}")
+            print()
+
+    else:
+        print_tabela(tabela)
+        print("✅ Gramática LL(1) válida!")
+
 
 def exec_pipeline(info):
     print("Welcome to Grammar Playground\n")
-    #time.sleep(1)
     print("1º PASSO - Desenvolver AST\n")
     resultado_ast = processarAST(info)
     
@@ -62,18 +76,13 @@ def exec_pipeline(info):
     first = compute_first(resultado_ast)
     follow = compute_follow(first, resultado_ast)
     print_sets(first, follow)
+    print_lookahead_simples(resultado_ast, first, follow)
 
     print("\n3º PASSO - Verificar se é LL(1)")
     tabela, lista_conflitos = lookahead(resultado_ast, first, follow)
-    if lista_conflitos:
-        print("🚨 A gramática possui conflitos:")
-        sugestoes = sugerir_correcoes(first, follow, lista_conflitos, resultado_ast)
-        for sugestao in sugestoes:
-            print(sugestao)
-    else:
-        print_tabela(tabela)
-        print("✅ Gramática LL(1) válida!")
+    conflitos(tabela, lista_conflitos, first, follow, resultado_ast)
 
+    print("\n4º PASSO - Parsing LL(1)\n")
 
 
 if __name__ == '__main__':

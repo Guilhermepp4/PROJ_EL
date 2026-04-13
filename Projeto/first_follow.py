@@ -96,6 +96,23 @@ def print_sets(first, follow):
     
     print("="*60 + "\n")
 
+def print_lookahead_simples(gramatica, first, follow):
+    print(f"{'NT':<10} {'Produção':<30} {'Lookahead Set'}")
+    print("-" * 60)
+    for regra in gramatica.regras:
+        A = regra.cabeca
+        for prod in regra.producoes:
+            sequencia = [prod.simbolo] + prod.listaSimbolos
+            
+            f_seq = rool_seq(first, sequencia, A)
+            
+            la = f_seq - {'ε'}
+            if 'ε' in f_seq:
+                la = la.union(follow[A])
+            
+            prod_str = f"{A} -> {prod.simbolo.simbolo} " + " ".join([s.simbolo for s in prod.listaSimbolos])
+            print(f"{A:<10} {prod_str:<30} {{ {', '.join(sorted(la))} }}")
+
 def lookahead(gramatica, first, follow):
     """
     Constrói a Tabela de Análise LL(1).
@@ -150,57 +167,55 @@ def print_tabela(tabela):
         for t, prod in caminhos.items():
             print(f"M[{nt}, {t}] = {prod}")
 
-def rFatorizacao(first, nt, producoes, gramatica):
-    # Dicionário para agrupar que produções são ativadas por cada terminal
-    # grupos = { 'id': [Producao(A), Producao(B)], ... }
-    grupos = {}
+def nonTerminalRole(gramatica, p, terminal_conflito, first, novas_opcoes_sufixo):
+    regra_interna = next((r for r in gramatica.regras if r.cabeca == p.simbolo.simbolo), None)
+    if regra_interna:
+        for p_interna in regra_interna.producoes:
+            seq = [p_interna.simbolo] + p_interna.listaSimbolos
+            if terminal_conflito in rool_seq(first, seq, p.simbolo.simbolo):
+                sufixo = " ".join([s.simbolo for s in p_interna.listaSimbolos])
+                novas_opcoes_sufixo.append(sufixo if sufixo else "ε")
 
+def terminalRole(p, terminal_conflito, novas_opcoes_sufixo):
+    if p.simbolo.simbolo == terminal_conflito:
+        sufixo = " ".join([s.simbolo for s in p.listaSimbolos])
+        novas_opcoes_sufixo.append(sufixo if sufixo else "ε")
+
+
+def rFatorizacao(first, nt, producoes, gramatica):
+    grupos = {}
     for p in producoes:
-        # Calculamos o FIRST da sequência (ex: FIRST de 'A')
         sequencia = [p.simbolo] + p.listaSimbolos
         f_seq = rool_seq(first, sequencia, nt)
-        
         for terminal in f_seq:
             if terminal == 'ε': continue
-            if terminal not in grupos: 
-                grupos[terminal] = []
+            if terminal not in grupos: grupos[terminal] = []
             grupos[terminal].append(p)
 
-    # Procuramos onde houve colisão (mais de uma produção para o mesmo terminal)
-    for terminal_conflito, conflito in grupos.items():
+    todas_as_sugestoes = []
+    contador = 1 # Para criar S_Prime1, S_Prime2, ...
 
+    for terminal_conflito, conflito in grupos.items():
         if len(conflito) > 1:
-            
-            nt_prime = f"{nt}_Prime"
-            # A nova regra base começa com o terminal que causou o conflito
+            nt_prime = f"{nt}_Prime{contador}"
             regra_base = f"{nt} -> {terminal_conflito} {nt_prime}"
             
             novas_opcoes_sufixo = []
-            
             for p in conflito:
-                # Se a produção for um NT (ex: S -> A), temos de ir buscar o "resto" de A
-                # depois de tirarmos o 'id'
+                # CASO 1: É um Não-Terminal (ex: S -> A) - Precisamos expandir
                 if not p.simbolo.e_terminal:
-                    regra_interna = next((r for r in gramatica.regras if r.cabeca == p.simbolo.simbolo), None)
-                    if regra_interna:
-                        for p_interna in regra_interna.producoes:
-
-                            # Se a regra interna (A) começa com o nosso terminal...
-                            seq = [p_interna.simbolo] + p_interna.listaSimbolos
-                            if terminal_conflito in rool_seq(first, seq, p.simbolo.simbolo):
-                                
-                                # O sufixo é tudo o que vem depois do primeiro símbolo de A
-                                sufixo = " ".join([s.simbolo for s in p_interna.listaSimbolos])
-                                novas_opcoes_sufixo.append(sufixo if sufixo else "ε")
+                    nonTerminalRole(gramatica, p, terminal_conflito, first, novas_opcoes_sufixo)
+                
+                # CASO 2: É um Terminal direto (ex: S -> '0' S '0')
                 else:
-                    # Se era um terminal direto (ex: S -> 'id' '=='), o sufixo é p.listaSimbolos
-                    sufixo = " ".join([s.simbolo for s in p.listaSimbolos])
-                    novas_opcoes_sufixo.append(sufixo if sufixo else "ε")
-
+                    # Se o terminal da produção for igual ao terminal que causou o conflito
+                    terminalRole(p, terminal_conflito, novas_opcoes_sufixo)
+                    
             regra_derivada = f"{nt_prime} -> {' | '.join(dict.fromkeys(novas_opcoes_sufixo))}"
-            return [regra_base, regra_derivada]
+            todas_as_sugestoes.extend([regra_base, regra_derivada])
+            contador += 1
 
-    return None
+    return todas_as_sugestoes if todas_as_sugestoes else None
 
 def rRecursao(nt_name, producoes):
     recursivas = []
@@ -253,45 +268,47 @@ def rFirstFollow(first, follow, nt, producoes):
         
         # Sugestão qualitativa: reestruturar para evitar a ambiguidade
         res = [
-            f"⚠️ Conflito FIRST/FOLLOW no símbolo '{term_str}'",
-            f"Dica: A regra '{nt}' pode ser vazia, mas o que vem a seguir também começa com '{term_str}'.",
-            f"Sugestão: Tenta explicitamente incluir o caso de '{term_str}' na regra '{nt}' ou subir esse símbolo na hierarquia."
+            f"❌ Conflito FIRST/FOLLOW no símbolo '{term_str}'",
+            f"💡 Dica: A regra '{nt}' pode ser vazia, mas o que vem a seguir também começa com '{term_str}'.",
+            f"👉 Sugestão: Tenta explicitamente incluir o caso de '{term_str}' na regra '{nt}' ou subir esse símbolo na hierarquia."
         ]
         return res
     
     return None
 
 def sugerir_correcoes(first, follow, conflitos_detetados, gramatica):
-    sugestoes = []
-    problemNts = set()
+    sugestoes = {}
+
     for c in conflitos_detetados:
         partes = c.split(" | ")
         tipo = partes[0]
         nt_prob = partes[1]
+        chave = (tipo, nt_prob)
 
-        if nt_prob in problemNts: continue
-        problemNts.add(nt_prob) 
+        regra_obj = next((r for r in gramatica.regras if r.cabeca == nt_prob), None)
+        if not regra_obj: continue
+
+        corrigida = None
+        titulo = ""
 
         regra_prob = next((r for r in gramatica.regras if r.cabeca == nt_prob) ,None)
         if tipo == "FIRST/FIRST":
             corrigida = rFatorizacao(first, nt_prob, regra_prob.producoes, gramatica)
-            if corrigida:
-                sugestoes.append({
-                    'Título': f"Fatorização necessária em {nt_prob}",
-                    'Correção': corrigida
-                })
+            titulo = f"Fatorização necessária em {nt_prob}"
+        
         elif tipo == "FIRST/FOLLOW":
             corrigida = rFirstFollow(first, follow, nt_prob, regra_prob.producoes)
-            if corrigida:
-                sugestoes.append({
-                    'Título': f"Ambiguidade FIRST/FOLLOW em {nt_prob}",
-                    'Correção': corrigida
-                })
+            titulo = f"Ambiguidade FIRST/FOLLOW em {nt_prob}"
+        
         elif tipo == "REQ/ESQ":
             corrigida = rRecursao(nt_prob, regra_prob.producoes)
-            if corrigida:
-                sugestoes.append({
-                    'Título': f"Recursão à esquerda em {nt_prob}",
-                    'Correção': corrigida
-                })
-    return sugestoes
+            titulo = f"Recursão à Esquerda em {nt_prob}"
+
+        if corrigida:
+            sugestoes[chave] = {
+                    'tipo_real': tipo,
+                    'titulo': titulo,
+                    'proposta': corrigida
+            }
+            
+    return list(sugestoes.values())
