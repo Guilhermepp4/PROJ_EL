@@ -29,6 +29,7 @@ def compute_first(gramatica):
                 changed = True
     return first
 
+#esta é a função usada para o first
 def processar_simbolo2(first_dict, sequencia, pai):
     
     for s in sequencia:
@@ -53,6 +54,7 @@ def processar_simbolo2(first_dict, sequencia, pai):
     first_dict[pai].add('ε')
     return True
 
+# tive de criar duas funções porque estava a dar conflito com o first
 def processar_simbolo(first_dict, sequencia, result):
     for s in sequencia:
         if s.e_terminal:
@@ -139,7 +141,32 @@ def print_lookahead_simples(gramatica, first, follow):
             prod_str = f"{A} -> {prod.simbolo.simbolo} " + " ".join([s.simbolo for s in prod.listaSimbolos])
             print(f"{A:<10} {prod_str:<30} {{ {', '.join(sorted(la))} }}")
 
-def lookahead(gramatica, first, follow):
+#função auxiliar para virificar se é recursiva a esquerda
+def verifyReqEsq(primeiro_da_prod, A, conflitos, prod_str):
+    if not primeiro_da_prod.e_terminal and primeiro_da_prod.simbolo == A:
+        conflitos.append(f"REQ/ESQ | {A} | {prod_str}")
+
+def verifyFF(first_da_sequencia, tabela_ll1, prod_str, A, conflitos):
+    for terminal in first_da_sequencia:
+        if terminal != 'ε':
+            if terminal in tabela_ll1[A]:
+                # Se já lá estava uma produção, temos o conflito detalhado!
+                prod_existente = tabela_ll1[A][terminal]
+                if prod_existente != prod_str: # Evita duplicados da mesma regra
+                    conflitos.append(f"FIRST/FIRST | {A} | {terminal} | {prod_existente} VS {prod_str}")
+            else:
+                tabela_ll1[A][terminal] = prod_str
+
+def verifyFFO(first_da_sequencia, follow, tabela_ll1, prod_str, A, conflitos):
+    if 'ε' in first_da_sequencia:
+        for terminal_f in follow[A]:
+            if terminal_f in tabela_ll1[A]:
+                prod_existente = tabela_ll1[A][terminal_f]
+                conflitos.append(f"FIRST/FOLLOW | {A} | {terminal_f} | {prod_existente} VS {prod_str}")
+            else:
+                tabela_ll1[A][terminal_f] = prod_str
+    
+def checkLL1(gramatica, first, follow):
     """
     Constrói a Tabela de Análise LL(1).
     A tabela indica: "Se estou no Não-Terminal X e o Lookahead é Y, uso a Produção Z".
@@ -158,28 +185,13 @@ def lookahead(gramatica, first, follow):
             
             # 1. Verificar Recursão à Esquerda (REQ/ESQ)
             primeiro_da_prod = sequencia[0]
-            if not primeiro_da_prod.e_terminal and primeiro_da_prod.simbolo == A:
-                conflitos.append(f"REQ/ESQ | {A} | {prod_str}")
+            verifyReqEsq(primeiro_da_prod, A, conflitos, prod_str)
 
             # 2. Preencher tabela com FIRST (FIRST/FIRST)
-            for terminal in first_da_sequencia:
-                if terminal != 'ε':
-                    if terminal in tabela_ll1[A]:
-                        # Se já lá estava uma produção, temos o conflito detalhado!
-                        prod_existente = tabela_ll1[A][terminal]
-                        if prod_existente != prod_str: # Evita duplicados da mesma regra
-                            conflitos.append(f"FIRST/FIRST | {A} | {terminal} | {prod_existente} VS {prod_str}")
-                    else:
-                        tabela_ll1[A][terminal] = prod_str
+            verifyFF(first_da_sequencia, tabela_ll1, prod_str, A, conflitos)            
 
             # 3. Preencher tabela com FOLLOW se for anulável (FIRST/FOLLOW)
-            if 'ε' in first_da_sequencia:
-                for terminal_f in follow[A]:
-                    if terminal_f in tabela_ll1[A]:
-                        prod_existente = tabela_ll1[A][terminal_f]
-                        conflitos.append(f"FIRST/FOLLOW | {A} | {terminal_f} | {prod_existente} VS {prod_str}")
-                    else:
-                        tabela_ll1[A][terminal_f] = prod_str
+            verifyFFO(first_da_sequencia, follow, tabela_ll1, prod_str, A, conflitos)
 
     return tabela_ll1, conflitos
 

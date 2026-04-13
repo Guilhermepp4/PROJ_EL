@@ -5,6 +5,18 @@ import time
 from first_follow import *
 
 # GRAMMAR_EXAMPLE = """
+# Program : lista
+
+# lista -> '['']'
+#     | '[' Elems ']'
+
+# Elems -> Elems "," Elem
+#     | Elem
+
+# Elem -> INT
+# """
+
+# GRAMMAR_EXAMPLE = """
 # Program : S
 # S -> '0' S '0'
 #      | '1' S '1'
@@ -13,7 +25,7 @@ from first_follow import *
 #      | 'ε'
 # """
 
-GRAMMAR_EXAMPLE = """\
+GRAMMAR_EXAMPLE = """
 Program : Lista
 
 Lista -> '[' Elems ']'
@@ -80,7 +92,7 @@ def exec_pipeline(info):
     print_lookahead_simples(resultado_ast, first, follow)
 
     print("\n3º PASSO - Verificar se é LL(1)")
-    tabela, lista_conflitos = lookahead(resultado_ast, first, follow)
+    tabela, lista_conflitos = checkLL1(resultado_ast, first, follow)
     conflitos(tabela, lista_conflitos, first, follow, resultado_ast)
 
     print("\n4º PASSO - Parsing LL(1)\n")
