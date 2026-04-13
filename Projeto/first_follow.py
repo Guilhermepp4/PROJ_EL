@@ -1,43 +1,69 @@
 from classes_parser import Init, Simbolo
 
 def compute_first(gramatica):
-    first = {nt : set() for nt in gramatica.get_nonterminals()}
-    result = set()
+    nts = gramatica.get_nonterminals()
+    first = {nt : set() for nt in nts}
+
+    nts_reversed = list(reversed(nts))
+
+
     changed = True
     while changed:
         changed = False
-        for regra in gramatica.regras:
-            A = regra.cabeca
-            for prod in regra.producoes:
-                
-                sequencia = [prod.simbolo] + prod.listaSimbolos
-                prev_len = len(first[A])
-                
-                let_continue = True
-                let_continue = processar_simbolo(first, sequencia, A, result)
 
-                if not let_continue:
-                    break
-                if let_continue:
-                    first[A].add('ε')
-                
-                if len(first[A]) > prev_len:
-                    changed = True
+        #vamos processar os não terrminais do fim para o inicio 
+        for A in nts_reversed:
+            #print(A)
+            prev_len = len(first[A])
+            
+            regras_de_A = [r for r in gramatica.regras if r.cabeca == A]
+            
+            for regra in regras_de_A:
+                for prod in regra.producoes:
+                    
+                    sequencia = [prod.simbolo] + prod.listaSimbolos
+
+                    processar_simbolo2(first, sequencia, A)
+                    
+            if len(first[A]) > prev_len:
+                changed = True
     return first
 
-def processar_simbolo(first_dict, sequencia, pai, result):
+def processar_simbolo2(first_dict, sequencia, pai):
+    
+    for s in sequencia:
+        simbolo = s.simbolo
+        if s.e_terminal:
+            #print(simbolo)
+            if simbolo == 'ε':
+                continue
+            else:
+                first_dict[pai].add(simbolo)
+                return False
+        else:
+            son_first = first_dict.get(simbolo, set())
+            if not son_first:
+                return False
+
+            first_dict[pai].update(son_first - {'ε'})
+
+            if 'ε' not in son_first:
+                return False
+
+    first_dict[pai].add('ε')
+    return True
+
+def processar_simbolo(first_dict, sequencia, result):
     for s in sequencia:
         if s.e_terminal:
             if s.simbolo == 'ε':
                 result.add('ε')
-                return True
+                continue
             else:
-                first_dict[pai].add(s.simbolo)
                 result.add(s.simbolo)
                 return False
         else:
             son_first = first_dict.get(s.simbolo, set())
-            first_dict[pai].update(son_first - {'ε'})
             result |= son_first - {'ε'}
             if 'ε' not in son_first:
                 return False
@@ -45,9 +71,9 @@ def processar_simbolo(first_dict, sequencia, pai, result):
     result.add('ε')
     return True
 
-def rool_seq(first, aux_seq, name_s):
+def rool_seq(first, aux_seq):
     result = set()
-    processar_simbolo(first, aux_seq, name_s, result)
+    processar_simbolo(first, aux_seq, result)
     return result
 
 def simple_sequencia(sequencia, A, first, follow):
@@ -57,7 +83,7 @@ def simple_sequencia(sequencia, A, first, follow):
             prev_len = len(follow[seq.simbolo])
             aux_seq = sequencia[i+1:]
 
-            aux_first = rool_seq(first, aux_seq, seq.simbolo)
+            aux_first = rool_seq(first, aux_seq)
             follow[seq.simbolo] |= (aux_first - {'ε'})
 
             if 'ε' in aux_first:
@@ -85,14 +111,14 @@ def compute_follow(first, gramatica):
 
 def print_sets(first, follow):
     print("\n" + "="*60)
-    print(f"{'NT':<15} | {'FIRST':<20} | {'FOLLOW'}")
+    print(f"{'NT':<15} | {'FIRST':<25} | {'FOLLOW'}")
     print("-" * 60)
     
     for nt in sorted(first.keys()):
         str_first = "{" + ", ".join(sorted(list(first[nt]))) + "}"
         str_follow = "{" + ", ".join(sorted(list(follow.get(nt, set())))) + "}"
         
-        print(f"{nt:<15} | {str_first:<20} | {str_follow}")
+        print(f"{nt:<15} | {str_first:<25} | {str_follow}")
     
     print("="*60 + "\n")
 
@@ -104,7 +130,7 @@ def print_lookahead_simples(gramatica, first, follow):
         for prod in regra.producoes:
             sequencia = [prod.simbolo] + prod.listaSimbolos
             
-            f_seq = rool_seq(first, sequencia, A)
+            f_seq = rool_seq(first, sequencia)
             
             la = f_seq - {'ε'}
             if 'ε' in f_seq:
@@ -128,7 +154,7 @@ def lookahead(gramatica, first, follow):
             prod_str = str_producao(sequencia)
             
             # FIRST da sequência
-            first_da_sequencia = rool_seq(first, sequencia, A)
+            first_da_sequencia = rool_seq(first, sequencia)
             
             # 1. Verificar Recursão à Esquerda (REQ/ESQ)
             primeiro_da_prod = sequencia[0]
@@ -172,7 +198,7 @@ def nonTerminalRole(gramatica, p, terminal_conflito, first, novas_opcoes_sufixo)
     if regra_interna:
         for p_interna in regra_interna.producoes:
             seq = [p_interna.simbolo] + p_interna.listaSimbolos
-            if terminal_conflito in rool_seq(first, seq, p.simbolo.simbolo):
+            if terminal_conflito in rool_seq(first, seq):
                 sufixo = " ".join([s.simbolo for s in p_interna.listaSimbolos])
                 novas_opcoes_sufixo.append(sufixo if sufixo else "ε")
 
@@ -186,7 +212,7 @@ def rFatorizacao(first, nt, producoes, gramatica):
     grupos = {}
     for p in producoes:
         sequencia = [p.simbolo] + p.listaSimbolos
-        f_seq = rool_seq(first, sequencia, nt)
+        f_seq = rool_seq(first, sequencia)
         for terminal in f_seq:
             if terminal == 'ε': continue
             if terminal not in grupos: grupos[terminal] = []
@@ -221,11 +247,12 @@ def rRecursao(nt_name, producoes):
     recursivas = []
     non_recursivas = []
     for prod in producoes:
+        #print(f"HERE {prod.simbolo.simbolo}")
         if prod.simbolo.simbolo == nt_name:
             recursivas.append(prod.listaSimbolos)
         else:
             non_recursivas.append(prod.listaSimbolos)
-        
+    
     if not recursivas:
         return "None"
     
@@ -246,7 +273,7 @@ def rFirstFollow(first, follow, nt, producoes):
     
     for p in producoes:
         sequencia = [p.simbolo] + p.listaSimbolos
-        if 'ε' in rool_seq(first, sequencia, nt):
+        if 'ε' in rool_seq(first, sequencia):
             prod_anulavel = p
         else:
             outras_prods.append(p)
@@ -258,7 +285,7 @@ def rFirstFollow(first, follow, nt, producoes):
     # e também no FIRST das outras produções
     terminais_conflito = set()
     for p in outras_prods:
-        f_seq = rool_seq(first, [p.simbolo] + p.listaSimbolos, nt)
+        f_seq = rool_seq(first, [p.simbolo] + p.listaSimbolos)
         conflito = f_seq.intersection(follow[nt])
         if conflito:
             terminais_conflito.update(conflito)

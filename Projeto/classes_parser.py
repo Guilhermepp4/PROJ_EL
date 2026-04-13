@@ -35,11 +35,13 @@ class Init(Node):
         return self.axioma
 
     def get_nonterminals(self):
-        non_terms = set()
+        non_terms = []
         for r in self.regras:
             valor = r.cabeca.simbolo if hasattr(r.cabeca, 'simbolo') else r.cabeca
-            non_terms.add(valor)
-        return list(non_terms)
+            # Só adiciona se ainda não estiver na lista para evitar duplicados
+            if valor not in non_terms:
+                non_terms.append(valor)
+        return non_terms
     
     def get_Terminals(self): # Notei que no teu erro chamaste get_Terminals com T maiúsculo
             terminals = set()

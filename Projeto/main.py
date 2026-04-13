@@ -4,26 +4,27 @@ from parser_grammar import parser_gram
 import time
 from first_follow import *
 
-GRAMMAR_EXAMPLE = """
-Program : S
-S -> '0' S '0'
-     | '1' S '1'
-     | '0'
-     | '1'
-     | 'ε'
-"""
-
-# GRAMMAR_EXAMPLE = """\
-# Program : Lista
-
-# Lista -> '[' Elems ']'
-# Elems -> ε
-#     | Elem ',' Elems
-# Elem -> INT | ID
-
-# INT = /[0-9]+/
-# ID = /[A-Za-z]+/
+# GRAMMAR_EXAMPLE = """
+# Program : S
+# S -> '0' S '0'
+#      | '1' S '1'
+#      | '0'
+#      | '1'
+#      | 'ε'
 # """
+
+GRAMMAR_EXAMPLE = """\
+Program : Lista
+
+Lista -> '[' Elems ']'
+Elems -> ε
+    | Elem ',' Elems
+
+Elem -> INT | ID
+
+INT = /[0-9]+/
+ID = /[A-Za-z]+/
+"""
 
 # GRAMMAR_EXAMPLE = """
 # Program : S
