@@ -259,11 +259,11 @@ def rRecursao(nt_name, producoes):
     recursivas = []
     non_recursivas = []
     for prod in producoes:
-        #print(f"HERE {prod.simbolo.simbolo}")
         if prod.simbolo.simbolo == nt_name:
             recursivas.append(prod.listaSimbolos)
         else:
-            non_recursivas.append(prod.listaSimbolos)
+            sequencia_completa = [prod.simbolo] + prod.listaSimbolos
+            non_recursivas.append(sequencia_completa)
     
     if not recursivas:
         return "None"
@@ -271,8 +271,8 @@ def rRecursao(nt_name, producoes):
     nt_prime = f"{nt_name}'"
     
     # Nova Regra 1: A -> beta A'
-    nova_regra_A = f"{nt_name} -> " + " | ".join([" ".join([s.simbolo for s in seq]) + f" {nt_prime}" for seq in non_recursivas])
-    
+    nova_regra_A = f"{nt_name} -> " + " | ".join([" ".join(s.simbolo for s in seq) + f" {nt_prime}" for seq in non_recursivas])
+
     # Nova Regra 2: A' -> alpha A' | ε
     nova_regra_A_prime = f"{nt_prime} -> " + " | ".join([" ".join([s.simbolo for s in seq]) + f" {nt_prime}" for seq in recursivas]) + " | ε"
     

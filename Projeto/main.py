@@ -4,17 +4,17 @@ from parser_grammar import parser_gram
 import time
 from first_follow import *
 
-# GRAMMAR_EXAMPLE = """
-# Program : lista
+GRAMMAR_EXAMPLE = """
+Program : lista
 
-# lista -> '['']'
-#     | '[' Elems ']'
+lista -> '['']'
+    | '[' Elems ']'
 
-# Elems -> Elems "," Elem
-#     | Elem
+Elems -> Elems "," Elem
+    | Elem
 
-# Elem -> INT
-# """
+Elem -> INT
+"""
 
 # GRAMMAR_EXAMPLE = """
 # Program : S
@@ -25,18 +25,18 @@ from first_follow import *
 #      | 'ε'
 # """
 
-GRAMMAR_EXAMPLE = """
-Program : Lista
+# GRAMMAR_EXAMPLE = """
+# Program : Lista
 
-Lista -> '[' Elems ']'
-Elems -> ε
-    | Elem ',' Elems
+# Lista -> '[' Elems ']'
+# Elems -> ε
+#     | Elem ',' Elems
 
-Elem -> INT | ID
+# Elem -> INT | ID
 
-INT = /[0-9]+/
-ID = /[A-Za-z]+/
-"""
+# INT = /[0-9]+/
+# ID = /[A-Za-z]+/
+# """
 
 # GRAMMAR_EXAMPLE = """
 # Program : S
