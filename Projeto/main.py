@@ -1,20 +1,21 @@
 import sys
 import os
 from parser_grammar import parser_gram
+from parser_grammar_recDesc import gera_parser_recursivo
 import time
 from first_follow import *
 
-GRAMMAR_EXAMPLE = """
-Program : lista
+# GRAMMAR_EXAMPLE = """
+# Program : lista
 
-lista -> '['']'
-    | '[' Elems ']'
+# lista -> '['']'
+#     | '[' Elems ']'
 
-Elems -> Elems "," Elem
-    | Elem
+# Elems -> Elems "," Elem
+#     | Elem
 
-Elem -> INT
-"""
+# Elem -> INT
+# """
 
 # GRAMMAR_EXAMPLE = """
 # Program : S
@@ -25,18 +26,18 @@ Elem -> INT
 #      | 'ε'
 # """
 
-# GRAMMAR_EXAMPLE = """
-# Program : Lista
+GRAMMAR_EXAMPLE = """
+Program : Lista
 
-# Lista -> '[' Elems ']'
-# Elems -> ε
-#     | Elem ',' Elems
+Lista -> '[' Elems ']'
+Elems -> ε
+    | Elem ',' Elems
 
-# Elem -> INT | ID
+Elem -> INT | ID
 
-# INT = /[0-9]+/
-# ID = /[A-Za-z]+/
-# """
+INT = /[0-9]+/
+ID = /[A-Za-z]+/
+"""
 
 # GRAMMAR_EXAMPLE = """
 # Program : S
@@ -75,11 +76,6 @@ def conflitos(tabela, lista_conflitos, first, follow, resultado_ast):
                 print(f"  -> {linha}")
             print()
 
-    else:
-        print_tabela(tabela)
-        print("✅ Gramática LL(1) válida!")
-
-
 def exec_pipeline(info):
     print("Welcome to Grammar Playground\n")
     print("1º PASSO - Desenvolver AST\n")
@@ -94,8 +90,38 @@ def exec_pipeline(info):
     print("\n3º PASSO - Verificar se é LL(1)")
     tabela, lista_conflitos = checkLL1(resultado_ast, first, follow)
     conflitos(tabela, lista_conflitos, first, follow, resultado_ast)
-
+    
     print("\n4º PASSO - Parsing LL(1)\n")
+    if lista_conflitos:
+        print("❗️ Atenção a gramática continha conflitos")
+    else:
+        print("✅ Gramática LL(1) válida!")
+
+    print_tabela(tabela)
+
+    print("\n5º PASSO - Gerar os Parsers\n")
+
+    if lista_conflitos:
+        print("❗️ Atenção a gramática escolhida, esta apresenta conflitos."
+              +"\nTente aplicar as sugestões antes de gerar os parsers")
+    else:
+        # Gerar o parser recursivo descendente correspondente
+        print("5.1.º Passo - Parser recursivo Descendente\n")
+        f_content = gera_parser_recursivo(resultado_ast, first, follow)
+
+        os.makedirs("parser_models", exist_ok=True)
+        f_write = "parser_models/RDParser.py"
+        try:
+            with open(f_write, "w", encoding='utf-8') as f:
+                f.write(f_content)
+            print("✅ Sucesso: Parser recursivo descendente gerado!!!")
+        except Exception as e:
+            print(f"❗️ Error: {e} -> Não foi possivel escrever nem guardar o ficheiro {f_write}")
+
+        print("5.2.º Passo - Parser Top-Down\n")
+
+
+        # Gerar o parser Top-Down dirigido por tabela correspondente
 
 
 if __name__ == '__main__':

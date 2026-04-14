@@ -200,7 +200,7 @@ def str_producao(sequencia):
     return " ".join([s.simbolo for s in sequencia])
 
 def print_tabela(tabela):
-    print("\n--- Tabela de Análise LL(1)---")
+    print("--- Tabela de Análise LL(1)---")
     for nt, caminhos in tabela.items():
         for t, prod in caminhos.items():
             print(f"M[{nt}, {t}] = {prod}")
