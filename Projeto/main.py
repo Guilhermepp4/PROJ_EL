@@ -114,8 +114,8 @@ def exec_pipeline(info):
         print("5.1.º Passo - Parser recursivo Descendente\n")
         f1_content = gera_parser_recursivo(resultado_ast, first, follow)
 
-        #os.makedirs("parser_models", exist_ok=True)
-        f_write = "RDParser.py"
+        os.makedirs("parser_models", exist_ok=True)
+        f_write = "parser_models/RDParser.py"
         try:
             with open(f_write, "w", encoding='utf-8') as f:
                 f.write(f1_content)
