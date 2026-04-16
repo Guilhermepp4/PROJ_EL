@@ -31,22 +31,22 @@ class Node:
 tokens = (
     'INT',
     'ID',
-    'COMMA',
     'LBRACK',
     'RBRACK',
+    'COMMA',
 )
 
 # Símbolos fixos (Variáveis têm precedência por ordem de tamanho de regex)
-def t_COMMA(t):
-    r','
-    return t
-
 def t_LBRACK(t):
     r'\['
     return t
 
 def t_RBRACK(t):
     r'\]'
+    return t
+
+def t_COMMA(t):
+    r','
     return t
 
 def t_INT(t):
@@ -71,9 +71,9 @@ lexer = lex.lex()
 # Mapeamento para tokens simples
 # '(': LPAREN, etc.
 simpleT_map = {
-    'COMMA': ',',
     'LBRACK': '[',
-    'RBRACK': ']'
+    'RBRACK': ']',
+    'COMMA': ','
 }
 
 def tokenizer(info):
@@ -84,7 +84,7 @@ def tokenizer(info):
         if not tok:
             break
         token_stream.append((tok.type, tok.value))
-    token_stream.append(('$', '$'))
+    token_stream.append(('final', 'final'))
     return token_stream
 # Variáveis globais para o parser
 token_stream = [] # Lista global para armazenar os tokens
@@ -107,40 +107,52 @@ def match(symbol):
 
 def p_Lista():
     '''Lista : [ Elems ]'''
-    if type_actual == '[':
+    if type_actual == 'LBRACK':
         children = []
-        children.append(Node('[', lexema=match('LBRACK')))
+        children.append(Node('LBRACK', lexema=match('LBRACK')))
         children.append(p_Elems())
-        children.append(Node(']', lexema=match('RBRACK')))
+        children.append(Node('RBRACK', lexema=match('RBRACK')))
         return Node('Lista', children=children)
-    else:
-        raise SyntaxError(f'Erro em Lista: inesperado {type_actual}')
+    raise SyntaxError(f'Erro em Lista: inesperado {type_actual}')
+
 def p_Elems():
-    '''Elems : ε  | Elem , Elems'''
-    if type_actual == ']':
-        children = []
-        children.append(Node('ε', lexema=match('None')))
-        return Node('Elems', children=children)
-    elif type_actual == 'INT' or type_actual == 'ID':
+    '''Elems : Elem Resto | ε '''
+    if type_actual == 'INT' or type_actual == 'ID':
         children = []
         children.append(p_Elem())
-        children.append(Node(',', lexema=match('COMMA')))
-        children.append(p_Elems())
+        children.append(p_Resto())
         return Node('Elems', children=children)
-    else:
-        raise SyntaxError(f'Erro em Elems: inesperado {type_actual}')
+    elif type_actual == 'RBRACK':
+        children = []
+        children.append(Node('ε'))
+        return Node('Elems', children=children)
+    raise SyntaxError(f'Erro em Elems: inesperado {type_actual}')
+
+def p_Resto():
+    '''Resto : , Elem Resto | ε '''
+    if type_actual == 'COMMA':
+        children = []
+        children.append(Node('COMMA', lexema=match('COMMA')))
+        children.append(p_Elem())
+        children.append(p_Resto())
+        return Node('Resto', children=children)
+    elif type_actual == 'RBRACK':
+        children = []
+        children.append(Node('ε'))
+        return Node('Resto', children=children)
+    raise SyntaxError(f'Erro em Resto: inesperado {type_actual}')
+
 def p_Elem():
     '''Elem : INT  | ID '''
     if type_actual == 'INT':
         children = []
-        children.append(Node('INT', lexema=match('None')))
+        children.append(Node('INT', lexema=match('INT')))
         return Node('Elem', children=children)
     elif type_actual == 'ID':
         children = []
-        children.append(Node('ID', lexema=match('None')))
+        children.append(Node('ID', lexema=match('ID')))
         return Node('Elem', children=children)
-    else:
-        raise SyntaxError(f'Erro em Elem: inesperado {type_actual}')
+    raise SyntaxError(f'Erro em Elem: inesperado {type_actual}')
 
 def parser_gram(info):
     global token_stream, token_pos, type_actual, lex_actual
@@ -150,7 +162,7 @@ def parser_gram(info):
     lexer.lineno = 1
     type_actual, lex_actual = token_stream[0]
     result = p_Lista() 
-    if type_actual != '$':
+    if type_actual != 'final':
         raise SyntaxError(f"Tokens extra após o fim: {type_actual}")
     return result
 
@@ -163,7 +175,7 @@ def main():
         print("No input file provided. Using default test string.")
     try:
         result = parser_gram(source)
-        result.pretty_print()  # Exemplo de uso do resultado
+        result.pretty_print()
     except Exception as e:
         print(f'Erro durante o parsing: {e}')
 

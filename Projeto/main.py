@@ -2,6 +2,7 @@ import sys
 import os
 from parser_grammar import parser_gram
 from parser_grammar_recDesc import gera_parser_recursivo
+from parser_grammar_TopDown import gera_parser_TopDown
 import time
 from first_follow import *
 
@@ -30,12 +31,16 @@ GRAMMAR_EXAMPLE = """
 Program : Lista
 
 Lista -> '[' Elems ']'
-Elems -> ε
-    | Elem ',' Elems
+Elems -> Elem Resto
+    | ε
+
+Resto -> ',' Elem Resto
+    | ε
 
 Elem -> INT | ID
 
 INT = /[0-9]+/
+
 ID = /[A-Za-z]+/
 """
 
@@ -107,18 +112,28 @@ def exec_pipeline(info):
     else:
         # Gerar o parser recursivo descendente correspondente
         print("5.1.º Passo - Parser recursivo Descendente\n")
-        f_content = gera_parser_recursivo(resultado_ast, first, follow)
+        f1_content = gera_parser_recursivo(resultado_ast, first, follow)
 
-        os.makedirs("parser_models", exist_ok=True)
-        f_write = "parser_models/RDParser.py"
+        #os.makedirs("parser_models", exist_ok=True)
+        f_write = "RDParser.py"
         try:
             with open(f_write, "w", encoding='utf-8') as f:
-                f.write(f_content)
+                f.write(f1_content)
             print("✅ Sucesso: Parser recursivo descendente gerado!!!")
         except Exception as e:
             print(f"❗️ Error: {e} -> Não foi possivel escrever nem guardar o ficheiro {f_write}")
 
         print("5.2.º Passo - Parser Top-Down\n")
+        # f2_content = gera_parser_TopDown()
+
+        # os.makedirs("parser_models", exist_ok=True)
+        # f_write = "parser_models/TDownParser.py"
+        # try:
+        #     with open(f_write, "w", encoding='utf-8') as f:
+        #         f.write(f2_content)
+        #     print("✅ Sucesso: Parser Top-Down dirigido por tabela gerado!!!")
+        # except Exception as e:
+        #     print(f"❗️ Error: {e} -> Não foi possivel escrever nem guardar o ficheiro {f_write}")
 
 
         # Gerar o parser Top-Down dirigido por tabela correspondente
