@@ -1,9 +1,8 @@
 import sys
 import os
 from parser_grammar import parser_gram
-from parser_grammar_recDesc import gera_parser_recursivo
-from parser_grammar_TopDown import gera_parser_TopDown
-import time
+from parser_rec import gera_parser_recursivo
+from parser_table import gera_parser_TopDown
 from first_follow import *
 
 # GRAMMAR_EXAMPLE = """
@@ -70,7 +69,7 @@ def processarAST(info):
 
     return resultado_ast
 
-def conflitos(tabela, lista_conflitos, first, follow, resultado_ast):
+def conflitos(lista_conflitos, first, follow, resultado_ast):
     if lista_conflitos:
         print(lista_conflitos)
         print("🚨 A gramática possui conflitos:")
@@ -80,6 +79,14 @@ def conflitos(tabela, lista_conflitos, first, follow, resultado_ast):
             for linha in sug['proposta']:
                 print(f"  -> {linha}")
             print()
+
+def makeFile(path, content, value):
+    try:
+        with open(path, "w", encoding='utf-8') as f:
+            f.write(content)
+        print(f"✅ Sucesso: Parser {value} gerado!!!\n")
+    except Exception as e:
+            print(f"❗️ Error: {e} -> Não foi possivel escrever nem guardar o ficheiro {path}")
 
 def exec_pipeline(info):
     print("Welcome to Grammar Playground\n")
@@ -94,49 +101,34 @@ def exec_pipeline(info):
 
     print("\n3º PASSO - Verificar se é LL(1)")
     tabela, lista_conflitos = checkLL1(resultado_ast, first, follow)
-    conflitos(tabela, lista_conflitos, first, follow, resultado_ast)
+    conflitos(lista_conflitos, first, follow, resultado_ast)
     
-    print("\n4º PASSO - Parsing LL(1)\n")
     if lista_conflitos:
-        print("❗️ Atenção a gramática continha conflitos")
+        print("❗️ Atenção a gramática contém conflitos")
     else:
         print("✅ Gramática LL(1) válida!")
 
     print_tabela(tabela)
 
-    print("\n5º PASSO - Gerar os Parsers\n")
+    print("\n4º PASSO - Gerar os Parsers\n")
 
     if lista_conflitos:
         print("❗️ Atenção a gramática escolhida, esta apresenta conflitos."
               +"\nTente aplicar as sugestões antes de gerar os parsers")
     else:
-        # Gerar o parser recursivo descendente correspondente
-        print("5.1.º Passo - Parser recursivo Descendente\n")
-        f1_content = gera_parser_recursivo(resultado_ast, first, follow)
-
         os.makedirs("parser_models", exist_ok=True)
-        f_write = "parser_models/RDParser.py"
-        try:
-            with open(f_write, "w", encoding='utf-8') as f:
-                f.write(f1_content)
-            print("✅ Sucesso: Parser recursivo descendente gerado!!!")
-        except Exception as e:
-            print(f"❗️ Error: {e} -> Não foi possivel escrever nem guardar o ficheiro {f_write}")
-
-        print("5.2.º Passo - Parser Top-Down\n")
-        # f2_content = gera_parser_TopDown()
-
-        # os.makedirs("parser_models", exist_ok=True)
-        # f_write = "parser_models/TDownParser.py"
-        # try:
-        #     with open(f_write, "w", encoding='utf-8') as f:
-        #         f.write(f2_content)
-        #     print("✅ Sucesso: Parser Top-Down dirigido por tabela gerado!!!")
-        # except Exception as e:
-        #     print(f"❗️ Error: {e} -> Não foi possivel escrever nem guardar o ficheiro {f_write}")
-
+        # Gerar o parser recursivo descendente correspondente
+        print("4.1.º Passo - Parser recursivo Descendente")
+        f1_content = gera_parser_recursivo(resultado_ast, first, follow)
+        makeFile("parser_models/RDParser.py", f1_content, "Recursivo Descendente")
 
         # Gerar o parser Top-Down dirigido por tabela correspondente
+        print("4.2.º Passo - Parser Top-Down")
+        f2_content = gera_parser_TopDown(resultado_ast, first, follow)
+        makeFile("parser_models/TDownParser.py", f2_content, "Top-Down dirigido por tabela")
+    
+    print("\n5º PASSO - Gerar codigo\n")
+    print("Pipeline concluída com sucesso! 🎉\n")
 
 
 if __name__ == '__main__':
@@ -150,16 +142,9 @@ if __name__ == '__main__':
         except Exception as e:
             print(f"Erro encontrado - {e} \n")
             sys.exit(1)
-        
         exec_pipeline(info)
-
     else:
         print("❌ Não foi detetada nenhuma gramática ❌")
         print("Processar a gramática de exemplo\n") 
-        
-        # for i in range(3):
-        #     print(".", end="", flush=True)
-        #     time.sleep(1)
-        
         exec_pipeline(GRAMMAR_EXAMPLE)  
     

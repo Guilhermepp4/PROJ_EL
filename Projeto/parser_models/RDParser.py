@@ -31,18 +31,18 @@ class Node:
 tokens = (
     'INT',
     'ID',
-    'RBRACK',
     'COMMA',
+    'RBRACK',
     'LBRACK',
 )
 
 # Símbolos fixos (Variáveis têm precedência por ordem de tamanho de regex)
-def t_RBRACK(t):
-    r'\]'
-    return t
-
 def t_COMMA(t):
     r','
+    return t
+
+def t_RBRACK(t):
+    r'\]'
     return t
 
 def t_LBRACK(t):
@@ -68,13 +68,16 @@ lexer = lex.lex()
 
 #__Parser__
 
-# Mapeamento para tokens simples
-# '(': LPAREN, etc.
+'''
+Mapeamento para tokens simples
+'(': LPAREN, etc.
+
 simpleT_map = {
-    'RBRACK': ']',
     'COMMA': ',',
+    'RBRACK': ']',
     'LBRACK': '['
 }
+'''
 
 def tokenizer(info):
     lexer.input(info)

@@ -1,0 +1,179 @@
+#Parser Top-Down dirigido por tabela
+
+import ply.lex as lex
+import sys
+import re
+import ply.yacc as yacc
+
+# Definição da classe Node para representar os nós da árvore de análise sintática
+
+class Node:
+    def __init__(self, name, children=None, lexema=None):
+        self.name = name
+        self.children = children if children is not None else []
+        self.lexema = lexema
+
+    def pretty_print(self, prefix='', is_last=True):
+        conector = '└── ' if is_last else '├── '
+        label = self.name
+        if self.lexema:
+            label += f': {self.lexema}'
+        print(prefix + conector + label)
+        new_prefix = prefix + ('    ' if is_last else '│   ')
+
+        for i, child in enumerate(self.children):
+            isLast = (i == len(self.children) - 1)
+            child.pretty_print(new_prefix, isLast)
+
+#__Lexer__
+tokens = (
+    'INT',
+    'ID',
+    'COMMA',
+    'RBRACK',
+    'LBRACK',
+)
+
+# Símbolos fixos (Variáveis têm precedência por ordem de tamanho de regex)
+def t_COMMA(t):
+    r','
+    return t
+
+def t_RBRACK(t):
+    r'\]'
+    return t
+
+def t_LBRACK(t):
+    r'\['
+    return t
+
+def t_INT(t):
+    r'[0-9]+'
+    t.value = int(t.value)
+    return t
+
+def t_ID(t):
+    r'[A-Za-z]+'
+    return t
+
+t_ignore = " \t\n"
+def t_error(t):
+    print(f'Erro na linha {t.lineno}: Caractere ilegal "{t.value[0]}"')
+    lexer.lineno += 1
+    t.lexer.skip(1)
+
+lexer = lex.lex()
+
+#__Parser__
+
+'''
+Mapeamento para tokens simples
+'(': LPAREN, etc.
+
+simpleT_map = {
+    'COMMA': ',',
+    'RBRACK': ']',
+    'LBRACK': '['
+}
+'''
+
+table_formatada = {
+    'Lista': {
+        'LBRACK': ['[', 'Elems', ']'],
+    },
+
+    'Elems': {
+        'INT': ['Elem', 'Resto'],
+        'ID': ['Elem', 'Resto'],
+        'RBRACK': [],
+    },
+
+    'Resto': {
+        'COMMA': [',', 'Elem', 'Resto'],
+        'RBRACK': [],
+    },
+
+    'Elem': {
+        'INT': ['INT'],
+        'ID': ['ID']
+    }
+}
+
+def tokenizer(info):
+    lexer.input(info)
+    token_stream = []
+    while True:
+        tok = lexer.token()
+        if not tok:
+            break
+        token_stream.append((tok.type, tok.value))
+    token_stream.append(('final', 'final'))
+    return token_stream
+
+def advance():
+    global token_stream, token_pos, type_actual, lex_actual
+    if token_pos < len(token_stream) - 1:
+        token_pos += 1
+    type_actual, lex_actual = token_stream[token_pos]
+
+NONTERMINALS = ['Lista', 'Elems', 'Resto', 'Elem']
+START_SYMBOL = 'Lista'
+
+# Variáveis globais para o parser
+token_stream = [] # Lista global para armazenar os tokens
+token_pos = 0 # Posição atual no token_stream
+type_actual = None # Tipo do token atual
+lex_actual = None # Lexema do token atual
+
+def parser_gram(info):
+    global token_stream, token_pos, type_actual, lex_actual
+    token_stream = tokenizer(info)
+    token_pos = 0
+    type_actual, lex_actual = token_stream[0]
+    
+    raiz = Node(START_SYMBOL)
+    stack = [(START_SYMBOL, raiz)]
+
+    while stack:
+        top_sym, no_pai = stack.pop()
+
+        if top_sym in NONTERMINALS:
+            if type_actual not in table_formatada[top_sym]:
+                raise SyntaxError(f'Erro: {top_sym} não tem regra para {type_actual}')
+            
+            producao = table_formatada[top_sym][type_actual]
+            
+            filhos_nodes = [Node(s) for s in producao]
+            no_pai.children = filhos_nodes
+            
+            for i in range(len(producao)-1, -1, -1):
+                if producao[i] != 'ε':
+                    stack.append((producao[i], filhos_nodes[i]))
+
+        else: # É Terminal
+            if top_sym == type_actual or top_sym == lex_actual:
+                no_pai.lexema = lex_actual
+                advance()
+            elif top_sym == 'ε':
+                continue
+            else:
+                raise SyntaxError(f'Esperado {top_sym}, mas obtido {lex_actual}')
+
+    return raiz
+
+    
+def main():
+    if len(sys.argv) > 1:
+        with open(sys.argv[1], encoding='utf-8') as f:
+            print(f"Parsing file: {sys.argv[1]}")
+            source = f.read()
+    else:
+        print("No input file provided. Using default test string.")
+    try:
+        result = parser_gram(source)
+        result.pretty_print()
+    except Exception as e:
+        print(f'Erro durante o parsing: {e}')
+
+if __name__ == '__main__':
+    main()
