@@ -1,9 +1,9 @@
 import sys
 import os
-from parser_grammar import parser_gram
-from parser_rec import gera_parser_recursivo
-from parser_table import gera_parser_TopDown
-from first_follow import *
+from src.parser_grammar import parser_gram
+from src.parser_rec import gera_parser_recursivo
+from src.parser_table import gera_parser_TopDown
+from src.first_follow import *
 
 # GRAMMAR_EXAMPLE = """
 # Program : lista

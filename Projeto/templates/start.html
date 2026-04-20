@@ -1,0 +1,83 @@
+{% extends "layout.html" %}
+
+{% block title %}Welcome - LL(1) Master{% endblock %}
+
+{% block content %}
+<div style="min-height: 100vh; padding-top: 80px; padding-bottom: 50px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+    
+    <div class="w3-content" style="max-width: 900px;">
+        
+        <div class="w3-card-4 w3-white w3-animate-bottom w3-round-xlarge" style="overflow: hidden; border: none;">
+            
+            <header class="w3-container w3-center" style="background: #2c3e50; color: white; padding: 80px 16px;">
+                <h1 class="w3-jumbo w3-animate-top">Welcome to <b>LL(1) Master</b></h1>
+                <p class="w3-xlarge w3-opacity" style="letter-spacing: 2px;">THE ULTIMATE GRAMMAR ANALYSIS TOOL</p>
+            </header>
+
+            <div class="w3-container w3-center w3-padding-64">
+                <div class="w3-row">
+                    <div class="w3-col m12">
+                        <p class="w3-xlarge w3-text-grey">
+                            Desenvolva, analise e valide gramáticas com precisão. <br>
+                            Gere tabelas de parsing e conjuntos First/Follow automaticamente.
+                        </p>
+                        
+                        <div class="w3-padding-32">
+                            <a href="/dashboard" class="w3-button w3-blue-grey w3-round-xxlarge w3-padding-large w3-xlarge w3-hover-black w3-card-4" style="transition: 0.3s; text-decoration: none;">
+                                <i class="fa fa-bolt w3-margin-right"></i>START ENGINE
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="w3-container w3-light-grey w3-padding-48">
+                <div class="w3-content" style="max-width: 700px;">
+                    <h4 class="w3-center w3-margin-bottom" style="font-weight: bold; color: #34495e;">
+                        <i class="fa fa-check-square-o w3-margin-right"></i>PROJECT ROADMAP1
+                    </h4>
+                    
+                    <div class="w3-responsive w3-round-large">
+                        <table class="w3-table-all w3-hoverable w3-card-2">
+                            <thead>
+                                <tr class="w3-blue-grey">
+                                    <th class="w3-padding-16">Componente</th>
+                                    <th class="w3-padding-16 w3-center">Estado</th>
+                                </tr>
+                            </thead>
+                            <tr class="w3-hover-pale-green">
+                                <td class="w3-padding-16">Lexer & Parser (PLY)</td>
+                                <td class="w3-center"><span class="w3-tag w3-green w3-round-large w3-small">OPERATIONAL</span></td>
+                            </tr>
+                            <tr class="w3-hover-pale-green">
+                                <td class="w3-padding-16">First/Follow Engine</td>
+                                <td class="w3-center"><span class="w3-tag w3-green w3-round-large w3-small">OPERATIONAL</span></td>
+                            </tr>
+                            <tr class="w3-hover-pale-green">
+                                <td class="w3-padding-16">Parsing Recursivo</td>
+                                <td class="w3-center"><span class="w3-tag w3-green w3-round-large w3-small">OPERATIONAL</span></td>
+                            </tr>
+                            <tr class="w3-hover-pale-green">
+                                <td class="w3-padding-16">Parsing dirigido por Tabela</td>
+                                <td class="w3-center"><span class="w3-tag w3-green w3-round-large w3-small">OPERATIONAL</span></td>
+                            </tr>
+                            <tr class="w3-hover-pale-red">
+                                <td class="w3-padding-16">Visitor Pattern</td>
+                                <td class="w3-center"><span class="w3-tag w3-red w3-round-large w3-small">IN DEVELOPMENT</span></td>
+                            </tr>
+                            <tr class="w3-hover-pale-red">
+                                <td class="w3-padding-16">Ontology Integration</td>
+                                <td class="w3-center"><span class="w3-tag w3-red w3-round-large w3-small">IN DEVELOPMENT</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </footer>
+        </div>
+        
+        <p class="w3-center w3-text-blue-grey w3-margin-top w3-opacity">
+            Created for Project Languages Engineering class &bull; 2026
+        </p>
+    </div>
+</div>
+{% endblock %}

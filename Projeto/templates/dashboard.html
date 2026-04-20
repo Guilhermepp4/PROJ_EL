@@ -1,0 +1,205 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard LL(1) Master{% endblock %}
+
+{% block content %}
+    <div class="w3-container w3-blue-grey w3-padding-16">
+        <h2><i class="fa fa-gears w3-margin-right"></i>Análise de Gramática LL(1)</h2>
+    </div>
+
+    <div class="w3-container w3-padding-32">
+        <div class="w3-card w3-round-large w3-white">
+            <div class="w3-container w3-padding">
+                <form action="/dashboard" method="POST">
+                    <textarea name="grammar" class="w3-input w3-border w3-round" 
+                              style="height: 180px; font-family: 'Fira Code', monospace; background-color: #f9f9f9;" 
+                              placeholder="Insira a gramática...">{{ grammar_input if grammar_input }}</textarea>
+                    
+                    <div class="w3-padding-16 w3-right-align">
+                        <a href="/dashboard" class="w3-button w3-border w3-round w3-margin-right">
+                            <i class="fa fa-undo"></i> Reset
+                        </a>
+                        <button type="submit" class="w3-button w3-blue w3-round">
+                            <i class="fa fa-rocket"></i> Executar Pipeline
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="w3-row-padding" style="margin:0 -16px">
+            <div class="w3-half">
+                <div class="w3-container w3-teal">
+                    <h5 style="font-family: 'Allerta Stencil', Sans-serif;"><b>Agrupamento de Simbolos</b></h5>
+                </div>
+                <table class="w3-table-all w3-card-4 w3-hoverable">
+                    <tbody>
+                        <tr>
+                            <td><b><span class="w3-tag">Terminais</span></b></td>
+                            <td>{% if not terminals %}<span class="w3-text-grey w3-small">Submeta uma Gramática para visualizar o conjunto dos Terminais</span>{% endif %}
+                                {% for s in terminals %}
+                                    {% if s == 'ε' %}
+                                        <span class="w3-tag w3-round w3-amber">{{ s }}</span>
+                                    {% else %}
+                                        <span class="w3-tag w3-round w3-light-blue">{{ s }}</span>
+                                    {% endif %}
+                                    {% if not loop.last %},{% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b><span class="w3-tag">Não Terminais</span></b></td>
+                            <td>{% if not non_terminals %}<span class="w3-text-grey w3-small">Submeta uma Gramática para visualizar o conjunto dos Não Terminais</span>{% endif %}
+                            <td>
+                                {% for s in non_terminals %}
+                                    <span class="w3-tag w3-round w3-light-black">{{ s }}</span>
+                                    {% if not loop.last %},{% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b><span class="w3-tag">Tokens</span></b></td>
+                            <td>{% if not tokens %}<span class="w3-text-grey w3-small">Submeta uma Gramática para visualizar o conjunto dos Tokens</span>{% endif %}
+                            <td>
+                                {% for s in tokens %}
+                                    <span class="w3-tag w3-round w3-green">{{ s }}</span>
+                                    {% if not loop.last %},{% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="w3-half">
+                <div class="w3-container w3-teal">
+                    <h5 style="font-family: 'Allerta Stencil', Sans-serif;"><b>Conjuntos FIRST</b></h5>
+                </div>
+                <table class="w3-table-all w3-card-4 w3-hoverable">
+                    <thead>
+                        <tr class="w3-blue-grey">
+                            <th>Não-Terminal</th>
+                            <th>Símbolos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if firsts %}
+                            {% for nt, simbolos in firsts.items() %}
+                            <tr>
+                                <td><b><span class="w3-tag w3-round w3-black">{{ nt }}</span></b></td>
+                                <td>
+                                    {% for s in simbolos %}
+                                        {% if s == 'ε' %}
+                                            <span class="w3-tag w3-round w3-blue">{{ s }}</span>
+                                        {% else %}
+                                            <span class="w3-tag w3-round w3-light-blue">{{ s }}</span>
+                                        {% endif %}
+                                        {% if not loop.last %},{% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="2" class="w3-text-grey w3-center w3-small">Submeta uma gramática para calcular os conjuntos FIRST.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="w3-half">
+                <div class="w3-container w3-teal w3-text-white">
+                    <h5 style="font-family: 'Allerta Stencil', Sans-serif;"><b>Conjuntos FOLLOW</b></h5>
+                </div>
+                <table class="w3-table-all w3-card-4 w3-hoverable">
+                    <thead>
+                        <tr class="w3-blue-grey">
+                            <th>Não-Terminal</th>
+                            <th>Símbolos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if follows %}
+                            {% for nt, simbolos in follows.items() %}
+                            <tr>
+                                <td><b><span class="w3-tag w3-round w3-black">{{ nt }}</span></b></td>
+                                <td>
+                                    {% for s in simbolos %}
+                                        {% if s == 'ε' %}
+                                            <span class="w3-tag w3-round w3-blue">{{ s }}</span>
+                                        {% elif s in terminals %}
+                                            <span class="w3-tag w3-round w3-light-blue">{{ s }}</span>
+                                        {% endif %}
+                                        {% if not loop.last %},{% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="2" class="w3-text-grey w3-center w3-small">Submeta uma gramática para calcular os conjuntos FOLLOW.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="w3-container w3-margin-top">
+            <div class="w3-container w3-dark-grey w3-round-top">
+                <h4 style="font-family: 'Allerta Stencil', Sans-serif;"><i class="fa fa-sitemap w3-margin-right"></i><b>Abstract Syntax Tree (AST)</b></h4>
+            </div>
+            <div class="w3-card-4 w3-white w3-padding" style="overflow-x: auto;">
+                {% if ast_visual %}
+                    <pre style="font-family: 'Courier New', Courier, monospace; line-height: 1.2; font-size: 14px;">
+                        {{ ast_visual }}
+                    </pre>
+                {% else %}
+                    <p class="w3-text-grey w3-center w3-small">Submeta uma gramática para visualizar a árvore.</p>
+                {% endif %}
+            </div>
+        </div>
+        <!-- {% if table %}
+        <div class="w3-container w3-margin-top">
+            <div class="w3-container w3-dark-grey">
+                <h4>Tabela Preditiva (Parsing Table)</h4>
+            </div>
+            <div class="w3-responsive">
+                <table class="w3-table-all w3-card-4 w3-hoverable">
+                    <thead>
+                        <tr class="w3-blue-grey">
+                            <th>NT \ Terminal</th>
+                            {% for token in todos_tokens %}
+                            <th>{{ token }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for nt, regras in table.items() %}
+                        <tr>
+                            <td class="w3-light-grey"><b>{{ nt }}</b></td>
+                            {% for token in todos_tokens %}
+                            <td>
+                                {% if token in regras %}
+                                    <span class="w3-text-blue" style="font-size: 0.9em;">{{ regras[token] }}</span>
+                                {% else %}
+                                    <span class="w3-text-light-grey">-</span>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %} -->
+        <div class="w3-center w3-padding-16">
+            <a href="/start" class="w3-button w3-blue w3-round w3-round-large">
+                <i class="fa fa-gear"></i> Lookahead & Parsers
+            </a>
+            <a href="/start" class="w3-button w3-white w3-border w3-border-black w3-round-large">
+              <i class="fa fa-home"></i> Go back to Home
+            </a>
+        </div>
+    </div>
+{% endblock %}

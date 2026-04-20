@@ -1,0 +1,13 @@
+body, h1, h2 { font-family: "Segoe UI", Arial, sans-serif; }
+        .hero-bg {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+        }
+        .main-card {
+            max-width: 800px;
+            width: 90%;
+            border-radius: 8px;
+        }
