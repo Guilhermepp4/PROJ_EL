@@ -35,34 +35,31 @@
                 <table class="w3-table-all w3-card-4 w3-hoverable">
                     <tbody>
                         <tr>
-                            <td><b><span class="w3-tag">Terminais</span></b></td>
-                            <td>{% if not terminals %}<span class="w3-text-grey w3-small">Submeta uma Gramática para visualizar o conjunto dos Terminais</span>{% endif %}
+                            <td style="width: 25%;"><b><span class="w3-tag w3-round w3-black">Terminais</span></b></td>
+                            <td>
+                                {% if not terminals %}<span class="w3-text-grey w3-small">Submeta uma Gramática...</span>{% endif %}
                                 {% for s in terminals %}
-                                    {% if s == 'ε' %}
-                                        <span class="w3-tag w3-round w3-amber">{{ s }}</span>
-                                    {% else %}
-                                        <span class="w3-tag w3-round w3-light-blue">{{ s }}</span>
-                                    {% endif %}
+                                    <span class="w3-tag w3-round {{ 'w3-amber' if s == 'ε' else 'w3-light-blue' }}">{{ s }}</span>
                                     {% if not loop.last %},{% endif %}
                                 {% endfor %}
                             </td>
                         </tr>
+                
                         <tr>
-                            <td><b><span class="w3-tag">Não Terminais</span></b></td>
-                            <td>{% if not non_terminals %}<span class="w3-text-grey w3-small">Submeta uma Gramática para visualizar o conjunto dos Não Terminais</span>{% endif %}
-                            <td>
+                            <td><b><span class="w3-tag w3-round w3-black">Não Terminais</span></b></td>
+                            <td> {% if not non_terminals %}<span class="w3-text-grey w3-small">Submeta uma Gramática...</span>{% endif %}
                                 {% for s in non_terminals %}
-                                    <span class="w3-tag w3-round w3-light-black">{{ s }}</span>
+                                    <span class="w3-tag w3-round w3-dark-grey">{{ s }}</span>
                                     {% if not loop.last %},{% endif %}
                                 {% endfor %}
                             </td>
                         </tr>
+                
                         <tr>
-                            <td><b><span class="w3-tag">Tokens</span></b></td>
-                            <td>{% if not tokens %}<span class="w3-text-grey w3-small">Submeta uma Gramática para visualizar o conjunto dos Tokens</span>{% endif %}
-                            <td>
-                                {% for s in tokens %}
-                                    <span class="w3-tag w3-round w3-green">{{ s }}</span>
+                            <td><b><span class="w3-tag w3-round w3-black">Tokens</span></b></td>
+                            <td> {% if not tokens %}<span class="w3-text-grey w3-small">Submeta uma Gramática...</span>{% endif %}
+                                {% for s, t in tokens.items() %}
+                                    {{ s }} -> <span class="w3-tag w3-round w3-green"> {{ t }} </span>
                                     {% if not loop.last %},{% endif %}
                                 {% endfor %}
                             </td>
@@ -87,6 +84,7 @@
                             <tr>
                                 <td><b><span class="w3-tag w3-round w3-black">{{ nt }}</span></b></td>
                                 <td>
+                                    {% if not simbolos %}<span class="w3-text-grey w3-small">Sem símbolos FIRST...</span>{% endif %}
                                     {% for s in simbolos %}
                                         {% if s == 'ε' %}
                                             <span class="w3-tag w3-round w3-blue">{{ s }}</span>
@@ -124,6 +122,7 @@
                             <tr>
                                 <td><b><span class="w3-tag w3-round w3-black">{{ nt }}</span></b></td>
                                 <td>
+                                    {% if not simbolos %}<span class="w3-text-grey w3-small">Sem símbolos FOLLOW...</span>{% endif %}
                                     {% for s in simbolos %}
                                         {% if s == 'ε' %}
                                             <span class="w3-tag w3-round w3-blue">{{ s }}</span>
@@ -150,9 +149,9 @@
             </div>
             <div class="w3-card-4 w3-white w3-padding" style="overflow-x: auto;">
                 {% if ast_visual %}
-                    <pre style="font-family: 'Courier New', Courier, monospace; line-height: 1.2; font-size: 14px;">
-                        {{ ast_visual }}
-                    </pre>
+                <pre style="font-family: 'Courier New'; line-height: 1.2; font-size: 14px; background-color: #282c34; color: #abb2bf; padding: 20px; border-radius: 5px;border-left: 5px solid #61afef;">
+                    {{- ast_visual -}}
+                </pre>
                 {% else %}
                     <p class="w3-text-grey w3-center w3-small">Submeta uma gramática para visualizar a árvore.</p>
                 {% endif %}

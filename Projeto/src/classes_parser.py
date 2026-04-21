@@ -9,19 +9,17 @@ class Init(Node):
         self.tokens = tokens
     
     def print_tree(self, prefix="", last=True):
-        print(prefix + "└── Init")
-        new_prefix = prefix + "    "
 
         if self.regras == []:
-            print(new_prefix + f"└── Axioma: {self.axioma}")
+            print(prefix + f"└── Axioma: {self.axioma}")
         else:
-            print(new_prefix + f"├── Axioma: {self.axioma}")
+            print(prefix + f"├── Axioma: {self.axioma}")
         
         # Imprimir as regras
         if isinstance(self.regras, list):
             for i, r in enumerate(self.regras): 
                 e_ultimo = (i == len(self.regras) - 1)
-                r.print_tree(new_prefix, e_ultimo)
+                r.print_tree(prefix, e_ultimo)
             
         # Imprimir os tokens
         if isinstance(self.tokens, list):
@@ -72,14 +70,16 @@ class Regra(Node):
         conector = "└── " if is_last else "├── "
         print(prefix + conector + "Regra: "+ f"{self.cabeca}")
         
+        new_prefix = prefix + ("    " if is_last else "|    ")
         # Verifica se producoes não é None e se é uma lista
         if self.producoes is not None:
-            if isinstance(self.producoes, list):
-                for i, p in enumerate(self.producoes):
-                    # Só chama print_tree se p não for None
-                    if p is not None:
-                        last = (i == len(self.producoes) - 1)
-                        p.print_tree(prefix + "    ", last)
+            lista_p = self.producoes if isinstance(self.producoes, list) else [self.producoes]
+
+            for i, p in enumerate(lista_p):
+                # Só chama print_tree se p não for None
+                if p is not None:
+                    last = (i == len(self.producoes) - 1)
+                    p.print_tree(new_prefix, last)
 
 class Producoes(Node):
     def __init__(self, simbolo, listaSimbolos):

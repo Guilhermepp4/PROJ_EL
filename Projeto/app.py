@@ -2,6 +2,7 @@ import io
 from contextlib import redirect_stdout
 from flask import Flask, render_template, request
 from datetime import datetime
+from src.classes_parser import (Init, Regra, Producoes)
 from src.first_follow import *
 from src.parser_grammar import parser_gram
 from src.main import GRAMMAR_EXAMPLE
@@ -25,12 +26,12 @@ def dashboardRoute():
         grammar_obj = parser_gram(info)
 
         if grammar_obj is None:
-            return render_template("dashboard.html", grammar_input=info, firsts={}, follows={}, ast_visual="", terminals=[], non_terminals=[], tokens=[])
+            return render_template("dashboard.html", grammar_input=info, firsts={}, follows={}, ast_visual="", terminals=[], non_terminals=[], tokens={})
 
         nT = grammar_obj.get_nonterminals()
         T = grammar_obj.get_Terminals()
-        Tok = grammar_obj.get_token()
-        
+        Tok = grammar_obj.get_token()   
+
         f = io.StringIO()
         with redirect_stdout(f):
             grammar_obj.print_tree()
@@ -56,7 +57,7 @@ def dashboardRoute():
                                ast_visual="",
                                terminals=[],
                                non_terminals=[],
-                               tokens=[]
+                               tokens={}
                                )
 
 # @app.route('/livro/<id_livro>')
