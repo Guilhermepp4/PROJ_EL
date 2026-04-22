@@ -3,23 +3,28 @@
 {% block title %}Dashboard LL(1) Master{% endblock %}
 
 {% block content %}
-    <div class="w3-container w3-blue-grey w3-padding-16">
-        <h2><i class="fa fa-gears w3-margin-right"></i>Análise de Gramática LL(1)</h2>
+    <div class="w3-container w3-blue-grey w3-padding-24 w3-center">
+        <h1 style="font-family: 'Allerta Stencil', Sans-serif; letter-spacing: 2px;">
+            <i class="fa fa-gears w3-margin-right"></i>ANÁLISE GRAMATICAL
+        </h1>
     </div>
 
     <div class="w3-container w3-padding-32">
-        <div class="w3-card w3-round-large w3-white">
+        <div class="w3-card-4 w3-round-large w3-white w3-margin-bottom">
+            <div class="w3-container w3-light-grey w3-round-top">
+                <h4><i class="fa fa-edit w3-margin-right"></i><b>Gramática de Entrada</b></h4>
+            </div>
             <div class="w3-container w3-padding">
                 <form action="/dashboard" method="POST">
                     <textarea name="grammar" class="w3-input w3-border w3-round" 
-                              style="height: 180px; font-family: 'Fira Code', monospace; background-color: #f9f9f9;" 
-                              placeholder="Insira a gramática...">{{ grammar_input if grammar_input }}</textarea>
+                              style="height: 180px; font-family: 'Fira Code', monospace; background-color: #ffffff; resize: vertical;" 
+                              placeholder="Ex: Program : Lista &#10;    Lista -> [ Elems ] ...">{{ grammar_input if grammar_input }}</textarea>
                     
                     <div class="w3-padding-16 w3-right-align">
-                        <a href="/dashboard" class="w3-button w3-border w3-round w3-margin-right">
-                            <i class="fa fa-undo"></i> Reset
+                        <a href="/reset" class="w3-button w3-light-grey w3-round-large w3-margin-right">
+                            <i class="fa fa-trash"></i> Reset
                         </a>
-                        <button type="submit" class="w3-button w3-blue w3-round">
+                        <button type="submit" class="w3-button w3-blue w3-round-large w3-hover-indigo">
                             <i class="fa fa-rocket"></i> Executar Pipeline
                         </button>
                     </div>
@@ -29,176 +34,102 @@
 
         <div class="w3-row-padding" style="margin:0 -16px">
             <div class="w3-half">
-                <div class="w3-container w3-teal">
-                    <h5 style="font-family: 'Allerta Stencil', Sans-serif;"><b>Agrupamento de Simbolos</b></h5>
+                <div class="w3-container w3-teal w3-round-top">
+                    <h5 style="font-family: 'Allerta Stencil', Sans-serif;"><i class="fa fa-list-ul w3-margin-right"></i><b>Simbolismo</b></h5>
                 </div>
-                <table class="w3-table-all w3-card-4 w3-hoverable">
+                <table class="w3-table-all w3-card-4">
                     <tbody>
                         <tr>
-                            <td style="width: 25%;"><b><span class="w3-tag w3-round w3-black">Terminais</span></b></td>
+                            <td style="width: 30%; vertical-align: middle;"><b>Terminais</b></td>
                             <td>
-                                {% if not terminals %}<span class="w3-text-grey w3-small">Submeta uma Gramática...</span>{% endif %}
                                 {% for s in terminals %}
-                                    <span class="w3-tag w3-round {{ 'w3-amber' if s == 'ε' else 'w3-light-blue' }}">{{ s }}</span>
-                                    {% if not loop.last %},{% endif %}
+                                    <span class="w3-tag w3-round-large {{ 'w3-amber' if s == 'ε' else 'w3-blue' }}" style="margin: 2px;">{{ s }}</span>
+                                {% else %}
+                                    <span class="w3-text-grey w3-small italic">A aguardar...</span>
                                 {% endfor %}
                             </td>
                         </tr>
-                
                         <tr>
-                            <td><b><span class="w3-tag w3-round w3-black">Não Terminais</span></b></td>
-                            <td> {% if not non_terminals %}<span class="w3-text-grey w3-small">Submeta uma Gramática...</span>{% endif %}
+                            <td style="vertical-align: middle;"><b>Não Terminais</b></td>
+                            <td>
                                 {% for s in non_terminals %}
-                                    <span class="w3-tag w3-round w3-dark-grey">{{ s }}</span>
-                                    {% if not loop.last %},{% endif %}
+                                    <span class="w3-tag w3-round-large w3-dark-grey" style="margin: 2px;">{{ s }}</span>
+                                {% else %}
+                                    <span class="w3-text-grey w3-small">A aguardar...</span>
                                 {% endfor %}
                             </td>
                         </tr>
-                
                         <tr>
-                            <td><b><span class="w3-tag w3-round w3-black">Tokens</span></b></td>
-                            <td> {% if not tokens %}<span class="w3-text-grey w3-small">Submeta uma Gramática...</span>{% endif %}
+                            <td style="vertical-align: middle;"><b>Tokens</b></td>
+                            <td>
                                 {% for s, t in tokens.items() %}
-                                    {{ s }} -> <span class="w3-tag w3-round w3-green"> {{ t }} </span>
-                                    {% if not loop.last %},{% endif %}
+                                    <span class="w3-text-dark-grey" style="font-family: monospace;">{{ s }}</span> <i class="fa fa-arrow-right w3-tiny"></i> <span class="w3-tag w3-round w3-green w3-small">{{ t }}</span>
+                                    <br>
+                                {% else %}
+                                    <span class="w3-text-grey w3-small">A aguardar...</span>
                                 {% endfor %}
                             </td>
                         </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="w3-half">
-                <div class="w3-container w3-teal">
-                    <h5 style="font-family: 'Allerta Stencil', Sans-serif;"><b>Conjuntos FIRST</b></h5>
-                </div>
-                <table class="w3-table-all w3-card-4 w3-hoverable">
-                    <thead>
-                        <tr class="w3-blue-grey">
-                            <th>Não-Terminal</th>
-                            <th>Símbolos</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if firsts %}
-                            {% for nt, simbolos in firsts.items() %}
-                            <tr>
-                                <td><b><span class="w3-tag w3-round w3-black">{{ nt }}</span></b></td>
-                                <td>
-                                    {% if not simbolos %}<span class="w3-text-grey w3-small">Sem símbolos FIRST...</span>{% endif %}
-                                    {% for s in simbolos %}
-                                        {% if s == 'ε' %}
-                                            <span class="w3-tag w3-round w3-blue">{{ s }}</span>
-                                        {% else %}
-                                            <span class="w3-tag w3-round w3-light-blue">{{ s }}</span>
-                                        {% endif %}
-                                        {% if not loop.last %},{% endif %}
-                                    {% endfor %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="2" class="w3-text-grey w3-center w3-small">Submeta uma gramática para calcular os conjuntos FIRST.</td>
-                            </tr>
-                        {% endif %}
                     </tbody>
                 </table>
             </div>
 
             <div class="w3-half">
-                <div class="w3-container w3-teal w3-text-white">
-                    <h5 style="font-family: 'Allerta Stencil', Sans-serif;"><b>Conjuntos FOLLOW</b></h5>
+                <div class="w3-container w3-indigo w3-round-top">
+                    <h5 style="font-family: 'Allerta Stencil', Sans-serif;"><i class="fa fa-exchange w3-margin-right"></i><b>Análise First/Follow</b></h5>
                 </div>
-                <table class="w3-table-all w3-card-4 w3-hoverable">
+                <table class="w3-table-all w3-card-4">
                     <thead>
-                        <tr class="w3-blue-grey">
-                            <th>Não-Terminal</th>
-                            <th>Símbolos</th>
+                        <tr class="w3-light-grey">
+                            <th>NT</th>
+                            <th class="w3-border-right">FIRST</th>
+                            <th>FOLLOW</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% if follows %}
-                            {% for nt, simbolos in follows.items() %}
-                            <tr>
-                                <td><b><span class="w3-tag w3-round w3-black">{{ nt }}</span></b></td>
-                                <td>
-                                    {% if not simbolos %}<span class="w3-text-grey w3-small">Sem símbolos FOLLOW...</span>{% endif %}
-                                    {% for s in simbolos %}
-                                        {% if s == 'ε' %}
-                                            <span class="w3-tag w3-round w3-blue">{{ s }}</span>
-                                        {% elif s in terminals %}
-                                            <span class="w3-tag w3-round w3-light-blue">{{ s }}</span>
-                                        {% endif %}
-                                        {% if not loop.last %},{% endif %}
-                                    {% endfor %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="2" class="w3-text-grey w3-center w3-small">Submeta uma gramática para calcular os conjuntos FOLLOW.</td>
-                            </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="w3-container w3-margin-top">
-            <div class="w3-container w3-dark-grey w3-round-top">
-                <h4 style="font-family: 'Allerta Stencil', Sans-serif;"><i class="fa fa-sitemap w3-margin-right"></i><b>Abstract Syntax Tree (AST)</b></h4>
-            </div>
-            <div class="w3-card-4 w3-white w3-padding" style="overflow-x: auto;">
-                {% if ast_visual %}
-                <pre style="font-family: 'Courier New'; line-height: 1.2; font-size: 14px; background-color: #282c34; color: #abb2bf; padding: 20px; border-radius: 5px;border-left: 5px solid #61afef;">
-                    {{- ast_visual -}}
-                </pre>
-                {% else %}
-                    <p class="w3-text-grey w3-center w3-small">Submeta uma gramática para visualizar a árvore.</p>
-                {% endif %}
-            </div>
-        </div>
-        <!-- {% if table %}
-        <div class="w3-container w3-margin-top">
-            <div class="w3-container w3-dark-grey">
-                <h4>Tabela Preditiva (Parsing Table)</h4>
-            </div>
-            <div class="w3-responsive">
-                <table class="w3-table-all w3-card-4 w3-hoverable">
-                    <thead>
-                        <tr class="w3-blue-grey">
-                            <th>NT \ Terminal</th>
-                            {% for token in todos_tokens %}
-                            <th>{{ token }}</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for nt, regras in table.items() %}
+                        {% for nt in non_terminals %}
                         <tr>
-                            <td class="w3-light-grey"><b>{{ nt }}</b></td>
-                            {% for token in todos_tokens %}
-                            <td>
-                                {% if token in regras %}
-                                    <span class="w3-text-blue" style="font-size: 0.9em;">{{ regras[token] }}</span>
-                                {% else %}
-                                    <span class="w3-text-light-grey">-</span>
-                                {% endif %}
+                            <td class="w3-center"><b>{{ nt }}</b></td>
+                            <td class="w3-border-right">
+                                {% for s in firsts.get(nt, []) %}
+                                    <span class="w3-tag w3-round-large w3-light-blue w3-tiny">{{ s }}</span>
+                                {% endfor %}
                             </td>
-                            {% endfor %}
+                            <td>
+                                {% for s in follows.get(nt, []) %}
+                                    <span class="w3-tag w3-round-large w3-pale-blue w3-text-blue w3-border w3-tiny" style="font-weight: bold;">{{ s }}</span>
+                                {% endfor %}
+                            </td>
                         </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="w3-center w3-text-grey">Submeta a gramática para calcular os conjuntos.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
+        </div> 
+
+        <div class="w3-container w3-margin-top">
+            <div class="w3-container w3-black w3-round-top">
+                <h4 style="font-family: 'Allerta Stencil', Sans-serif;"><i class="fa fa-sitemap w3-margin-right"></i><b>Estrutura Hierárquica (AST)</b></h4>
+            </div>
+            <div class="w3-card-4 w3-white" style="overflow-x: auto; border-radius: 0 0 8px 8px;">
+                {% if ast_visual %}
+                <pre style="margin:0; font-family: 'Fira Code', 'Courier New', monospace; line-height: 1.4; font-size: 14px; background-color: #282c34; color: #abb2bf; padding: 25px; border-left: 10px solid #61afef;">{{- ast_visual.strip() -}}</pre>
+                {% else %}
+                    <div class="w3-padding-32 w3-center">
+                        <i class="fa fa-code-fork w3-xxlarge w3-text-light-grey"></i>
+                        <p class="w3-text-grey">A árvore será gerada após a execução.</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
-        {% endif %} -->
-        <div class="w3-center w3-padding-16">
-            <a href="/start" class="w3-button w3-blue w3-round w3-round-large">
-                <i class="fa fa-gear"></i> Lookahead & Parsers
+
+        <div class="w3-center w3-padding-32">
+            <a href="/parsers" class="w3-button w3-blue w3-xlarge w3-round-xxlarge w3-card-4 w3-hover-indigo" style="padding: 12px 32px;">
+                <i class="fa fa-code w3-margin-right"></i> Lookahead & Parsers
             </a>
-            <a href="/start" class="w3-button w3-white w3-border w3-border-black w3-round-large">
-              <i class="fa fa-home"></i> Go back to Home
-            </a>
+            <p><a href="/start" class="w3-text-grey w3-hover-text-black" style="text-decoration: none;">Voltar para o Início</a></p>
         </div>
     </div>
 {% endblock %}

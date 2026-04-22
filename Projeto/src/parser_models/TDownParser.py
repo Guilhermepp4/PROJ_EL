@@ -29,22 +29,22 @@ class Node:
 tokens = (
     'INT',
     'ID',
-    'LBRACK',
-    'RBRACK',
     'COMMA',
+    'RBRACK',
+    'LBRACK',
 )
 
 # Símbolos fixos (Variáveis têm precedência por ordem de tamanho de regex)
-def t_LBRACK(t):
-    r'\['
+def t_COMMA(t):
+    r','
     return t
 
 def t_RBRACK(t):
     r'\]'
     return t
 
-def t_COMMA(t):
-    r','
+def t_LBRACK(t):
+    r'\['
     return t
 
 def t_INT(t):
@@ -71,9 +71,9 @@ Mapeamento para tokens simples
 '(': LPAREN, etc.
 
 simpleT_map = {
-    'LBRACK': '[',
+    'COMMA': ',',
     'RBRACK': ']',
-    'COMMA': ','
+    'LBRACK': '['
 }
 '''
 
@@ -83,8 +83,8 @@ table_formatada = {
     },
 
     'Elems': {
-        'INT': ['Elem', 'Resto'],
         'ID': ['Elem', 'Resto'],
+        'INT': ['Elem', 'Resto'],
         'RBRACK': [],
     },
 

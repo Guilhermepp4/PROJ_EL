@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+
+{% block title %}Parsers - LL(1) Master{% endblock %}
+
+{% block content %}
+<div class="w3-container w3-blue-grey w3-padding-16">
+    <h2><i class="fa fa-code w3-margin-right"></i>Lookahead & Parsers</h2>
+</div>
+
+<div class="w3-container w3-padding-32">
+    <div class="w3-container w3-margin-bottom">
+        <div class="w3-container w3-teal w3-round-top">
+            <h5 style="font-family: 'Allerta Stencil', Sans-serif;"><b><i class="fa fa-table w3-margin-right"></i>Tabela Lookahead</b></h5>
+        </div>
+        <table class="w3-table-all w3-card-4 w3-hoverable">
+            <thead>
+                <tr class="w3-blue-grey">
+                    <th style="width: 20%">Não-Terminal</th>
+                    <th style="width: 30%">Símbolos Lookahead</th>
+                    <th style="width: 50%">Produções Correspondentes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for nt in non_terminals %}
+                <tr>
+                    <td><b><span class="w3-tag w3-round w3-black">{{ nt }}</span></b></td>
+                    <td style="border-left: 1px solid #ddd;">
+                        {% set lista_look = tabela.get(nt, {}) %}
+                        {% for s in lista_look.keys() %}
+                            <span class="w3-tag w3-round w3-indigo w3-small">{{ s }}</span>
+                        {% endfor %}
+                    </td>
+                    <td style="border-left: 1px solid #ddd;">
+                        {% set producoes_unicas = tabela.get(nt, {}).values() | unique | list %}
+                        {% if producoes_unicas %}
+                            {% for prod in producoes_unicas %}
+                                <code class="w3-text-teal" style="font-weight: bold;">{{ prod }}</code>
+                                {% if not loop.last %} <b class="w3-text-grey">|</b> {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <span class="w3-text-grey w3-small"><i>Sem produções...</i></span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="w3-container w3-margin-top w3-center">
+        <hr style="border-top: 1px solid #ccc;">
+        <div class="w3-card-4 w3-light-grey w3-padding-24 w3-round-large" style="display: inline-block; min-width: 400px;">
+            <h4 style="font-family: 'Allerta Stencil', Sans-serif;">Gerar Parser Programático</h4>
+            <p class="w3-text-grey">Transforme esta gramática num analisador sintático funcional em Python.</p>
+            
+            <div class="w3-bar">
+                <form action="/generate_parser" method="POST" style="display:inline;">
+                    <button type="submit" class="w3-button w3-blue w3-round-large w3-margin">
+                        <i class="fa fa-download w3-margin-right"></i>Baixar Parser (.py)
+                    </button>
+                </form>
+                
+                <a href="/dashboard" class="w3-button w3-white w3-border w3-round-large">
+                    <i class="fa fa-arrow-left w3-margin-right"></i>Voltar à Gramática
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
