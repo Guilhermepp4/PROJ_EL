@@ -1,4 +1,4 @@
-from src.classes_parser import Init, Simbolo
+from classes_parser import Init, Simbolo
 
 def compute_first(gramatica):
     nts = gramatica.get_nonterminals()

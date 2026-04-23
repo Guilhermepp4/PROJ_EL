@@ -23,7 +23,7 @@ def SimpleToken(token):
 
 #Função para verificar se um terminal é um símbolo fixo (entre aspas) ou não
 def simpleT(term):
-    if term.startswith(("'", '"')) or term.startswith(('"', '"')):
+    if term.startswith(("'", '"')) and term.endswith(("'", '"')):
         return True 
     return False
 

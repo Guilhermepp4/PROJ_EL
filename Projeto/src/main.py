@@ -1,9 +1,10 @@
 import sys
 import os
-from src.parser_grammar import parser_gram
-from src.parser_rec import gera_parser_recursivo
-from src.parser_table import gera_parser_TopDown
-from src.first_follow import *
+from parser_grammar import parser_gram
+from parser_rec import gera_parser_recursivo
+from parser_table import gera_parser_TopDown
+from first_follow import *
+from my_visitor import gera_visitor
 
 # GRAMMAR_EXAMPLE = """
 # Program : lista
@@ -84,7 +85,7 @@ def makeFile(path, content, value):
     try:
         with open(path, "w", encoding='utf-8') as f:
             f.write(content)
-        print(f"✅ Sucesso: Parser {value} gerado!!!\n")
+        print(f"✅ Sucesso: {value} gerado!!!\n")
     except Exception as e:
             print(f"❗️ Error: {e} -> Não foi possivel escrever nem guardar o ficheiro {path}")
 
@@ -120,14 +121,17 @@ def exec_pipeline(info):
         # Gerar o parser recursivo descendente correspondente
         print("4.1.º Passo - Parser recursivo Descendente")
         f1_content = gera_parser_recursivo(resultado_ast, first, follow)
-        makeFile("parser_models/RDParser.py", f1_content, "Recursivo Descendente")
+        makeFile("parser_models/RDParser.py", f1_content, "Parser Recursivo Descendente")
 
         # Gerar o parser Top-Down dirigido por tabela correspondente
         print("4.2.º Passo - Parser Top-Down")
         f2_content = gera_parser_TopDown(resultado_ast, first, follow)
-        makeFile("parser_models/TDownParser.py", f2_content, "Top-Down dirigido por tabela")
+        makeFile("parser_models/TDownParser.py", f2_content, "Parser Top-Down dirigido por tabela")
     
-    print("\n5º PASSO - Gerar codigo\n")
+    print("\n5º PASSO - Ações Semânticas via Funções de Visita\n")
+    visitor_content = gera_visitor(resultado_ast)
+    makeFile("parser_models/Visitor.py", visitor_content, "Visitor")
+
     print("Pipeline concluída com sucesso! 🎉\n")
 
 

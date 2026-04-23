@@ -1,5 +1,5 @@
-from src.first_follow import checkLL1
-from src.help_parsers import *
+from first_follow import checkLL1
+from help_parsers import *
 
 def gera_parser_TopDown(grammar, first, follow):
     start = grammar.get_inicial()
@@ -22,7 +22,6 @@ def gera_parser_TopDown(grammar, first, follow):
             simpleToken[token] = t[1:-1]
     
     table, _= checkLL1(grammar, first, follow)
-    print(f"HERE {table}")
     parserLines = []
     parserLines.append("#Parser Top-Down dirigido por tabela")
     parserLines.append("")

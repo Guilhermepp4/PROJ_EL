@@ -31,18 +31,18 @@ class Node:
 tokens = (
     'INT',
     'ID',
-    'COMMA',
     'RBRACK',
+    'COMMA',
     'LBRACK',
 )
 
 # Símbolos fixos (Variáveis têm precedência por ordem de tamanho de regex)
-def t_COMMA(t):
-    r','
-    return t
-
 def t_RBRACK(t):
     r'\]'
+    return t
+
+def t_COMMA(t):
+    r','
     return t
 
 def t_LBRACK(t):
@@ -73,8 +73,8 @@ Mapeamento para tokens simples
 '(': LPAREN, etc.
 
 simpleT_map = {
-    'COMMA': ',',
     'RBRACK': ']',
+    'COMMA': ',',
     'LBRACK': '['
 }
 '''
