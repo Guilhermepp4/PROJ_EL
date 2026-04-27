@@ -200,6 +200,7 @@ def gera_parser_TopDown(grammar, first, follow):
     parserLines.append("        result.pretty_print()")
     parserLines.append("    except Exception as e:")
     parserLines.append("        print(f'Erro durante o parsing: {e}')")
+    parserLines.append("        sys.exit(1)")
     parserLines.append("")
     parserLines.append("if __name__ == '__main__':")
     parserLines.append("    main()")

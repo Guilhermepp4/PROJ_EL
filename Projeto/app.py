@@ -1,7 +1,7 @@
 import io
 import re
 from contextlib import redirect_stdout
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, render_template, request, session, redirect, make_response
 from datetime import datetime
 from src.classes_parser import (Init, Regra, Producoes)
 from src.first_follow import *
@@ -9,12 +9,26 @@ from src.parser_grammar import parser_gram
 from src.main import conflitos, GRAMMAR_EXAMPLE
 from src.parser_table import gera_parser_TopDown
 from src.parser_rec import gera_parser_recursivo
+import subprocess
+import sys
+import tempfile
+import os
 
 app = Flask(__name__)
 
 data_hora_local = datetime.now()
 data_iso = data_hora_local.strftime('"%Y-%m-%dT%H:%M:%S')
 app.secret_key = 'uma_chave'
+
+
+def gerar_codigo_do_parser(grammar, type):
+    parser_grama = parser_gram(grammar)
+    first = compute_first(parser_grama)
+    follow = compute_follow(first, parser_grama)
+    if type == 'Table':
+        return gera_parser_TopDown(parser_grama, first, follow)
+    else:
+        return gera_parser_recursivo(parser_grama, first, follow)
 
 @app.route('/')
 @app.route('/start')
@@ -145,6 +159,7 @@ def parsersRoute():
 def generate_parser():
     grammar_text = session.get('grammar_text')
     option = request.form.get('action_id')
+    file_name = request.form.get('file_name', '').strip()
 
     if not grammar_text:
         return redirect('/dashboard')
@@ -161,11 +176,68 @@ def generate_parser():
     else:
         parser_code = gera_parser_recursivo(grammar_obj, first, follow)
 
-    # Salva o código do parser em um arquivo
-    with open(f"generated_parser{option}.py", "w") as f:
-        f.write(parser_code)
+    response = make_response(parser_code)
+    response.headers['Content-Disposition'] = f'attachment; filename={file_name}'
+    response.headers['Content-Type'] = 'text/x-python'
     
-    return "Parser gerado com sucesso! O código foi salvo em 'generated_parser.py'."
+    session['parser'] = response
+    
+    return response
+
+
+@app.route('/test')
+def test_page():
+    return render_template("test.html")
+
+
+
+@app.route('/run_test', methods=['POST'])
+def run_test():
+    parser_type = request.form.get('parser_type')
+    test_input = request.form.get('test_input', '').strip()
+
+    codigo_gerado = gerar_codigo_do_parser(session.get('grammar_text'), parser_type)
+
+    # 2. Criar um ficheiro temporário para o código e outro para o input
+    with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode='w', encoding='utf-8') as pf:
+        pf.write(codigo_gerado)
+        path_parser = pf.name
+
+    with tempfile.NamedTemporaryFile(suffix=".txt", delete=False, mode='w', encoding='utf-8') as inf:
+        inf.write(test_input)
+        path_input = inf.name
+
+    try:
+        res = subprocess.run(
+            [sys.executable, path_parser, path_input],
+            capture_output=True,
+            text=True,
+            timeout=5
+        )
+
+        lines = res.stdout.splitlines()
+        finalTree = "Program\n"+"\n".join(lines[1:])
+        if res.returncode != 1:
+            resultado = {
+                'status': 'success',
+                'output': finalTree, 
+            }
+        else:
+            for line in lines[1:]:
+                    error_message = line
+                    break
+            resultado = {
+                'status': 'error',
+                'error': error_message or res.stderr.strip() or "Erro desconhecido durante a execução do parser."
+            }
+
+    except Exception as e:
+        resultado = {'status': 'error', 'error': str(e)}
+    finally:
+        if os.path.exists(path_parser): os.remove(path_parser)
+        if os.path.exists(path_input): os.remove(path_input)
+
+    return render_template("test.html", resultado=resultado, last_input=test_input)
 
 if __name__ == '__main__':
     app.run(debug = True)

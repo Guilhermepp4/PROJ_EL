@@ -48,29 +48,76 @@
     </div>
     {% if not conflitos %}
         <div class="w3-container w3-margin-top w3-center">
-            <hr style="border-top: 1px solid #ccc;">
-            <div class="w3-card-4 w3-light-grey w3-padding-24 w3-round-large" style="display: inline-block; min-width: 400px;">
-                <h4 style="font-family: 'Allerta Stencil', Sans-serif;">Gerar Parser Programático</h4>
-                <p class="w3-text-grey">Escolha o parser que deseja descarregar.</p>
+            <hr style="border-top: 1px solid #eee; margin: 40px 0;">
+            
+            <div class="w3-container">
+                <h3 style="font-family: 'Allerta Stencil', Sans-serif;" class="w3-text-blue-grey">
+                    <i class="fa fa-rocket w3-margin-right"></i>Gerar Parser Programático
+                </h3>
+                <p class="w3-text-grey">A sua gramática é válida! Escolha uma arquitetura para exportar o código Python.</p>
+            </div>
+
+            <div class="w3-row-padding w3-margin-top" style="display: flex; justify-content: center; flex-wrap: wrap;">
                 
-                <div class="w3-bar">
-                    <form action="/generate_parser" method="POST" style="display:inline;">
-                        <button type="submit" class="w3-button w3-blue w3-round-large w3-margin">
-                            <i class="fa fa-download w3-margin-right"></i>Parser dirigido por Tabela(.py)
-                            <input type="hidden" name="action_id" value="Table">                            
-                        </button>
-                    </form>
-                    <form action="/generate_parser" method="POST" style="display:inline;">
-                        <button type="submit" class="w3-button w3-blue w3-round-large w3-margin">
-                            <i class="fa fa-download w3-margin-right"></i>Parser recursivo(.py)
-                            <input type="hidden" name="action_id" value="Rec">
-                        </button>
-                    </form>
-                    
-                    <a href="/dashboard" class="w3-button w3-white w3-border w3-round-large">
-                        <i class="fa fa-arrow-left w3-margin-right"></i>Voltar à Gramática
-                    </a>
+                <div class="w3-col l4 m6 s12 w3-margin-bottom">
+                    <div class="w3-card-4 w3-white w3-round-large w3-display-container w3-hover-shadow" style="height: 100%;">
+                        <div class="w3-container w3-blue w3-round-top w3-padding">
+                            <i class="fa fa-table w3-xxlarge"></i>
+                        </div>
+                        <div class="w3-container w3-padding-24">
+                            <h4><b>Tabela de Parsing</b></h4>
+                            <p class="w3-small w3-text-grey">Utiliza uma pilha e a tabela de lookahead para processar tokens de forma iterativa.</p>
+                            <form action="/generate_parser" method="POST">
+                                <input type="hidden" name="action_id" value="Table">
+                                <div class="w3-margin-bottom">
+                                    <label class="w3-tiny"><b>Escolha o nome do ficheiro:</b></label>
+                                    <input type="text" name="file_name" class="w3-input w3-border w3-round" 
+                                    placeholder="ex: meu_parser" value="my_parser.py">                
+                                </div>    
+                                    <button type="submit" class="w3-button w3-blue w3-round-large w3-block w3-hover-indigo">
+                                    <i class="fa fa-download w3-margin-right"></i>Descarregar .py
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="w3-col l4 m6 s12 w3-margin-bottom">
+                    <div class="w3-card-4 w3-white w3-round-large w3-display-container w3-hover-shadow" style="height: 100%;">
+                        <div class="w3-container w3-indigo w3-round-top w3-padding">
+                            <i class="fa fa-code-fork w3-xxlarge"></i>
+                        </div>
+                        <div class="w3-container w3-padding-24">
+                            <h4><b>Descendente Recursivo</b></h4>
+                            <p class="w3-small w3-text-grey">Implementa cada Não-Terminal como uma função. Ideal para gramáticas mais intuitivas.</p>
+                            <form action="/generate_parser" method="POST">
+                                <input type="hidden" name="action_id" value="Rec">
+                                
+                                <div class="w3-margin-bottom">
+                                    <label class="w3-tiny"><b>Escolha o nome do ficheiro:</b></label>
+                                    <input type="text" name="file_name" class="w3-input w3-border w3-round" 
+                                    placeholder="ex: meu_parser" value="my_parser.py">                
+                                </div>
+
+                                <button type="submit" class="w3-button w3-indigo w3-round-large w3-block w3-hover-blue">
+                                    <i class="fa fa-download w3-margin-right"></i>Descarregar .py
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="w3-container w3-margin-top">
+                <a href="/test" class="w3-button w3-blue w3-xlarge w3-round-xxlarge w3-card-4 w3-hover-indigo" style="padding: 12px 32px;">
+                    <i class="fa fa-check-square-o w3-margin-right"></i>Testar os Parsers Gerados
+                </a>
+            </div>
+            <div class="w3-container w3-margin-top">
+                <a href="/dashboard" class="w3-button w3-light-grey w3-round-large w3-border">
+                    <i class="fa fa-arrow-left w3-margin-right"></i>Voltar à Gramática
+                </a>
             </div>
         </div>
     {% else %}
