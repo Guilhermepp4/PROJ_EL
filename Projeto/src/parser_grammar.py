@@ -1,6 +1,6 @@
 import ply.yacc as yacc
-from my_lexer import lexer, tokens
-from classes_parser import (Init, Regra, Producoes, 
+from src.my_lexer import lexer, tokens
+from src.classes_parser import (Init, Regra, Producoes, 
                             Simbolo, token)
 
 # --- PARSER (Monta a AST) ---

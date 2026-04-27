@@ -1,10 +1,10 @@
 import sys
 import os
-from parser_grammar import parser_gram
-from parser_rec import gera_parser_recursivo
-from parser_table import gera_parser_TopDown
-from first_follow import *
-from my_visitor import gera_visitor
+from src.parser_grammar import parser_gram
+from src.parser_rec import gera_parser_recursivo
+from src.parser_table import gera_parser_TopDown
+from src.first_follow import *
+from src.my_visitor import gera_visitor
 
 # GRAMMAR_EXAMPLE = """
 # Program : lista
@@ -72,14 +72,25 @@ def processarAST(info):
 
 def conflitos(lista_conflitos, first, follow, resultado_ast):
     if lista_conflitos:
+        sugestoes_para_html = []
+        new_conflitos = []
         print(lista_conflitos)
+        
+        for conflito in lista_conflitos:
+            new_conflito = conflito.split(" | ")
+            new_conflitos.append(new_conflito[-1])
         print("🚨 A gramática possui conflitos:")
+        
         sugestoes = sugerir_correcoes(first, follow, lista_conflitos, resultado_ast)
-        for sug in sugestoes:
-            print(f"Sugestão para {sug['tipo_real']}: {sug['titulo']}")
-            for linha in sug['proposta']:
-                print(f"  -> {linha}")
-            print()
+        for i, sug in enumerate(sugestoes):
+            sugestoes_para_html.append({
+                "tipo_real": sug['tipo_real'],
+                "titulo": sug['titulo'],
+                "conflito": new_conflitos[i],
+                "proposta": sug['proposta']
+            })
+
+        return sugestoes_para_html
 
 def makeFile(path, content, value):
     try:

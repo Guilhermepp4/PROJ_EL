@@ -1,4 +1,5 @@
-from classes_parser import Init, Simbolo
+from src.classes_parser import Init, Simbolo
+from src.help_parsers import *
 
 def compute_first(gramatica):
     nts = gramatica.get_nonterminals()
@@ -144,7 +145,7 @@ def print_lookahead_simples(gramatica, first, follow):
 #função auxiliar para virificar se é recursiva a esquerda
 def verifyReqEsq(primeiro_da_prod, A, conflitos, prod_str):
     if not primeiro_da_prod.e_terminal and primeiro_da_prod.simbolo == A:
-        conflitos.append(f"REQ/ESQ | {A} | {prod_str}")
+        conflitos.append(f"REQ/ESQ | {A} | {A} -> {prod_str}")
 
 def verifyFF(first_da_sequencia, tabela_ll1, prod_str, A, conflitos):
     for terminal in first_da_sequencia:
@@ -153,7 +154,7 @@ def verifyFF(first_da_sequencia, tabela_ll1, prod_str, A, conflitos):
                 # Se já lá estava uma produção, temos o conflito detalhado!
                 prod_existente = tabela_ll1[A][terminal]
                 if prod_existente != prod_str: # Evita duplicados da mesma regra
-                    conflitos.append(f"FIRST/FIRST | {A} | {terminal} | {prod_existente} VS {prod_str}")
+                    conflitos.append(f"FIRST/FIRST | {A} | {terminal} | {A} -> {prod_existente} VS {A} -> {prod_str}")
             else:
                 tabela_ll1[A][terminal] = prod_str
 
@@ -162,7 +163,7 @@ def verifyFFO(first_da_sequencia, follow, tabela_ll1, prod_str, A, conflitos):
         for terminal_f in follow[A]:
             if terminal_f in tabela_ll1[A]:
                 prod_existente = tabela_ll1[A][terminal_f]
-                conflitos.append(f"FIRST/FOLLOW | {A} | {terminal_f} | {prod_existente} VS {prod_str}")
+                conflitos.append(f"FIRST/FOLLOW | {A} | {terminal_f} | {A} -> {prod_existente} VS {A} -> {prod_str}")
             else:
                 tabela_ll1[A][terminal_f] = prod_str
     
@@ -211,12 +212,12 @@ def nonTerminalRole(gramatica, p, terminal_conflito, first, novas_opcoes_sufixo)
         for p_interna in regra_interna.producoes:
             seq = [p_interna.simbolo] + p_interna.listaSimbolos
             if terminal_conflito in rool_seq(first, seq):
-                sufixo = " ".join([s.simbolo for s in p_interna.listaSimbolos])
+                sufixo = " ".join([formatar_simbolo(s.simbolo) for s in p_interna.listaSimbolos])
                 novas_opcoes_sufixo.append(sufixo if sufixo else "ε")
 
 def terminalRole(p, terminal_conflito, novas_opcoes_sufixo):
     if p.simbolo.simbolo == terminal_conflito:
-        sufixo = " ".join([s.simbolo for s in p.listaSimbolos])
+        sufixo = " ".join([formatar_simbolo(s.simbolo) for s in p.listaSimbolos])
         novas_opcoes_sufixo.append(sufixo if sufixo else "ε")
 
 
@@ -236,7 +237,7 @@ def rFatorizacao(first, nt, producoes, gramatica):
     for terminal_conflito, conflito in grupos.items():
         if len(conflito) > 1:
             nt_prime = f"{nt}_Prime{contador}"
-            regra_base = f"{nt} -> {terminal_conflito} {nt_prime}"
+            regra_base = f"{nt} -> {formatar_simbolo(terminal_conflito)} {nt_prime}"
             
             novas_opcoes_sufixo = []
             for p in conflito:
@@ -268,13 +269,13 @@ def rRecursao(nt_name, producoes):
     if not recursivas:
         return "None"
     
-    nt_prime = f"{nt_name}'"
+    nt_prime = f"{nt_name}_prime"
     
     # Nova Regra 1: A -> beta A'
-    nova_regra_A = f"{nt_name} -> " + " | ".join([" ".join(s.simbolo for s in seq) + f" {nt_prime}" for seq in non_recursivas])
+    nova_regra_A = f"{nt_name} -> " + " | ".join([" ".join(formatar_simbolo(s.simbolo) for s in seq) + f" {nt_prime}" for seq in non_recursivas])
 
     # Nova Regra 2: A' -> alpha A' | ε
-    nova_regra_A_prime = f"{nt_prime} -> " + " | ".join([" ".join([s.simbolo for s in seq]) + f" {nt_prime}" for seq in recursivas]) + " | ε"
+    nova_regra_A_prime = f"{nt_prime} -> " + " | ".join([" ".join([formatar_simbolo(s.simbolo) for s in seq]) + f" {nt_prime}" for seq in recursivas]) + " | ε"
     
     return [nova_regra_A, nova_regra_A_prime]
 
@@ -322,6 +323,7 @@ def sugerir_correcoes(first, follow, conflitos_detetados, gramatica):
         partes = c.split(" | ")
         tipo = partes[0]
         nt_prob = partes[1]
+        terminal = partes[2]
         chave = (tipo, nt_prob)
 
         regra_obj = next((r for r in gramatica.regras if r.cabeca == nt_prob), None)
@@ -333,15 +335,15 @@ def sugerir_correcoes(first, follow, conflitos_detetados, gramatica):
         regra_prob = next((r for r in gramatica.regras if r.cabeca == nt_prob) ,None)
         if tipo == "FIRST/FIRST":
             corrigida = rFatorizacao(first, nt_prob, regra_prob.producoes, gramatica)
-            titulo = f"Fatorização necessária em {nt_prob}"
+            titulo = f"Fatorização necessária em {nt_prob} para resolver conflito com '{terminal}'"
         
         elif tipo == "FIRST/FOLLOW":
             corrigida = rFirstFollow(first, follow, nt_prob, regra_prob.producoes)
-            titulo = f"Ambiguidade FIRST/FOLLOW em {nt_prob}"
+            titulo = f"Ambiguidade FIRST/FOLLOW em {nt_prob} para símbolo '{terminal}'"
         
         elif tipo == "REQ/ESQ":
             corrigida = rRecursao(nt_prob, regra_prob.producoes)
-            titulo = f"Recursão à Esquerda em {nt_prob}"
+            titulo = f"Recursão à Esquerda em {nt_prob} necessita eliminação"
 
         if corrigida:
             sugestoes[chave] = {

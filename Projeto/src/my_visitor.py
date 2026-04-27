@@ -1,5 +1,5 @@
-from help_parsers import *
-from classes_parser import *
+from src.help_parsers import *
+from src.classes_parser import *
 from collections import Counter
 import re
 
