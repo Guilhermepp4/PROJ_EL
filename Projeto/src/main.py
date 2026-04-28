@@ -143,6 +143,8 @@ def exec_pipeline(info):
     visitor_content = gera_visitor(resultado_ast)
     makeFile("parser_models/Visitor.py", visitor_content, "Visitor")
 
+    print("\n6º PASSO - Testar a função de visita com input\n")
+
     print("Pipeline concluída com sucesso! 🎉\n")
 
 

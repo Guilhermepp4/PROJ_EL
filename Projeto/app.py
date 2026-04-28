@@ -3,18 +3,22 @@ import re
 from contextlib import redirect_stdout
 from flask import Flask, render_template, request, session, redirect, make_response
 from datetime import datetime
-from src.classes_parser import (Init, Regra, Producoes)
-from src.first_follow import *
-from src.parser_grammar import parser_gram
-from src.main import conflitos, GRAMMAR_EXAMPLE
-from src.parser_table import gera_parser_TopDown
-from src.parser_rec import gera_parser_recursivo
 import subprocess
 import sys
 import tempfile
 import os
 
+sys.path.insert(0, 'src')
+
+from classes_parser import (Init, Regra, Producoes)
+from first_follow import *
+from parser_grammar import parser_gram
+from main import conflitos, GRAMMAR_EXAMPLE
+from parser_table import gera_parser_TopDown
+from parser_rec import gera_parser_recursivo
+
 app = Flask(__name__)
+
 
 data_hora_local = datetime.now()
 data_iso = data_hora_local.strftime('"%Y-%m-%dT%H:%M:%S')
@@ -234,6 +238,16 @@ def run_test():
         if os.path.exists(path_input): os.remove(path_input)
 
     return render_template("test.html", resultado=resultado, last_input=test_input)
+
+@app.route('/set_mode/visitor')
+def set_mode_visitor():
+    session['mode'] = 'visitor'
+    return redirect('/test')
+
+@app.route('/set_mode/parsing')
+def set_mode_parsing():
+    session['mode'] = 'parsing'
+    return redirect('/test')
 
 if __name__ == '__main__':
     app.run(debug = True)

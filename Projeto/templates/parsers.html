@@ -109,15 +109,23 @@
 
             </div>
 
-            <div class="w3-container w3-margin-top">
-                <a href="/test" class="w3-button w3-blue w3-xlarge w3-round-xxlarge w3-card-4 w3-hover-indigo" style="padding: 12px 32px;">
-                    <i class="fa fa-check-square-o w3-margin-right"></i>Testar os Parsers Gerados
-                </a>
-            </div>
-            <div class="w3-container w3-margin-top">
-                <a href="/dashboard" class="w3-button w3-light-grey w3-round-large w3-border">
-                    <i class="fa fa-arrow-left w3-margin-right"></i>Voltar à Gramática
-                </a>
+            <div class="w3-container w3-margin-top w3-padding-24 w3-light-grey w3-round-xlarge w3-border">
+                <div class="w3-row-padding">
+                    <div class="w3-col l8 m12">
+                        <h4 style="margin-top: 0;"><b>Tudo pronto!</b></h4>
+                        <p class="w3-text-grey">Os teus parsers foram gerados com sucesso. Podes testá-los agora com frases de entrada.</p>
+                    </div>
+                    <div class="w3-col l4 m12 w3-right-align">
+                        <a href="/test" class="w3-button w3-teal w3-round-large w3-card w3-hover-green w3-block" style="padding: 15px;">
+                            <i class="fa fa-rocket w3-margin-right"></i> Começar Testes
+                        </a>
+                        <div class="w3-margin-top">
+                            <a href="/dashboard" class="w3-text-blue-grey w3-hover-text-indigo" style="text-decoration: none; font-size: 0.9em;">
+                               <i class="fa fa-undo"></i> Ajustar Gramática
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     {% else %}
