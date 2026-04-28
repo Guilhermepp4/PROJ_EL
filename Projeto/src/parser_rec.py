@@ -1,6 +1,6 @@
 import re
-from src.classes_parser import *
-from src.help_parsers import *
+from classes_parser import *
+from help_parsers import *
 
 def _lookahead(sequencia, nt_pai, first_sets, follow_sets):
     """

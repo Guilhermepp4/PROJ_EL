@@ -179,17 +179,13 @@ def generate_parser():
     response = make_response(parser_code)
     response.headers['Content-Disposition'] = f'attachment; filename={file_name}'
     response.headers['Content-Type'] = 'text/x-python'
-    
-    session['parser'] = response
-    
+        
     return response
 
 
 @app.route('/test')
 def test_page():
     return render_template("test.html")
-
-
 
 @app.route('/run_test', methods=['POST'])
 def run_test():

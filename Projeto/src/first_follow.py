@@ -1,5 +1,5 @@
-from src.classes_parser import Init, Simbolo
-from src.help_parsers import *
+from classes_parser import Init, Simbolo
+from help_parsers import *
 
 def compute_first(gramatica):
     nts = gramatica.get_nonterminals()

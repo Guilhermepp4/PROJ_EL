@@ -1,5 +1,5 @@
-from src.first_follow import checkLL1
-from src.help_parsers import *
+from first_follow import checkLL1
+from help_parsers import *
 
 def gera_parser_TopDown(grammar, first, follow):
     start = grammar.get_inicial()
