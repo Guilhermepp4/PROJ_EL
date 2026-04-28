@@ -6,17 +6,17 @@ from parser_table import gera_parser_TopDown
 from first_follow import *
 from my_visitor import gera_visitor
 
-GRAMMAR_EXAMPLE = """
-Program : lista
+# GRAMMAR_EXAMPLE = """
+# Program : lista
 
-lista -> '['']'
-    | '[' Elems ']'
+# lista -> '['']'
+#     | '[' Elems ']'
 
-Elems -> Elems "," Elem
-    | Elem
+# Elems -> Elems "," Elem
+#     | Elem
 
-Elem -> INT
-"""
+# Elem -> INT
+# """
 
 # GRAMMAR_EXAMPLE = """
 # Program : S
@@ -27,22 +27,22 @@ Elem -> INT
 #      | 'ε'
 # """
 
-# GRAMMAR_EXAMPLE = """
-# Program : Lista
+GRAMMAR_EXAMPLE = """
+Program : Lista
 
-# Lista -> '[' Elems ']'
-# Elems -> Elem Resto
-#     | ε
+Lista -> '[' Elems ']'
+Elems -> Elem Resto
+    | ε
 
-# Resto -> ',' Elem Resto
-#     | ε
+Resto -> ',' Elem Resto
+    | ε
 
-# Elem -> INT | ID
+Elem -> INT | ID
 
-# INT = /[0-9]+/
+INT = /[0-9]+/
 
-# ID = /[A-Za-z]+/
-# """
+ID = /[A-Za-z]+/
+"""
 
 # GRAMMAR_EXAMPLE = """
 # Program : S

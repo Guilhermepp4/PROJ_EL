@@ -44,12 +44,32 @@ def gera_visitor(grammar):
     visitorLines.append("Welcome to the generated Visitor class for your grammar!")
     visitorLines.append("'''")
     visitorLines.append("")
-    visitorLines.append("class CodeGen:")
+    visitorLines.append("class VisitorBase:")
+    visitorLines.append("  def visit(self, node):")
+    visitorLines.append("    if node is None: return None")
+    visitorLines.append("    if node.lexema is not None:")
+    visitorLines.append("       return node.lexema")
+    visitorLines.append("")
+    visitorLines.append("    method_name = 'visit_' + node.label")
+    visitorLines.append("    method = getattr(self, method_name)")
+    visitorLines.append("    return method(node)")
+    visitorLines.append("")
+    visitorLines.append("  def visit_gen(self, node):")
+    visitorLines.append("    partes = []")
+    visitorLines.append("")
+    visitorLines.append("    for child in node.children:")
+    visitorLines.append("      result = self.visit(child)")
+    visitorLines.append("      if result is not None and str(result).strip():")
+    visitorLines.append("         partes.append(result)")
+    visitorLines.append("")
+    visitorLines.append("    return ' '.join(partes)")    
+    visitorLines.append("")
+    visitorLines.append("class CodeGen(VisitorBase):")
     
     terminals = grammar.get_Terminals()
     nTerminals = grammar.get_nonterminals()
     for nt in nTerminals: 
-        visitorLines.append(f"    def visit_{nt}(self, node):")
+        visitorLines.append(f"  def visit_{nt}(self, node):")
     
         for regra in grammar.regras:
             if regra.cabeca == nt:
@@ -64,27 +84,27 @@ def gera_visitor(grammar):
                         if producao.simbolo.simbolo != 'ε':
                             if i == 0:
                                 tamanho = len(sequencia)
-                                visitorLines.append(f"      if len(node.children) == {tamanho} and node.children[0] == '{producao.simbolo.simbolo}':")
+                                visitorLines.append(f"    if len(node.children) == {tamanho} and node.children[0].label == '{producao.simbolo.simbolo}':")
                                 for i, s in enumerate(sequencia):
                                     clean_name = result[s.simbolo]
                                     if s.simbolo in terminals:
-                                        visitorLines.append(f"          {clean_name} = node.children[{i}].lexama")
+                                        visitorLines.append(f"      {clean_name} = node.children[{i}].lexema")
                                     else:
-                                        visitorLines.append(f"          {clean_name} = self.visit(node.children[{i}])")
-                                names = ','.join([f"{result[s.simbolo]} " for s in sequencia])
-                                visitorLines.append(f"          return {names}")
+                                        visitorLines.append(f"      {clean_name} = self.visit(node.children[{i}])")
+                                #names = ','.join([f"{result[s.simbolo]} " for s in sequencia])
+                                visitorLines.append(f"      return self.visit_gen(node)")
                                 visitorLines.append(f"")
                             else:
                                 tamanho = len(sequencia)
-                                visitorLines.append(f"      elif len(node.children) == {tamanho} and node.children[0] == '{producao.simbolo.simbolo}':")
+                                visitorLines.append(f"    elif len(node.children) == {tamanho} and node.children[0].label == '{producao.simbolo.simbolo}':")
                                 for i, s in enumerate(sequencia):
                                     clean_name = result[s.simbolo]
                                     if s.simbolo in terminals:
-                                        visitorLines.append(f"          {clean_name} = node.children[{i}].lexama")
+                                        visitorLines.append(f"      {clean_name} = node.children[{i}].lexema")
                                     else:
-                                        visitorLines.append(f"          {clean_name} = self.visit(node.children[{i}])")
-                                names = ','.join([f"{result[s.simbolo]} " for s in sequencia])
-                                visitorLines.append(f"          return {names}")
+                                        visitorLines.append(f"      {clean_name} = self.visit(node.children[{i}])")
+                                #names = ','.join([f"{result[s.simbolo]} " for s in sequencia])
+                                visitorLines.append(f"      return self.visit_gen(node)")
                                 visitorLines.append(f"")
                 
                     else:
@@ -92,13 +112,13 @@ def gera_visitor(grammar):
                             for i, s in enumerate(sequencia):
                                 clean_name = result[s.simbolo]
                                 if s.simbolo in terminals:
-                                    visitorLines.append(f"      {clean_name} = node.children[{i}].lexama")
+                                    visitorLines.append(f"    {clean_name} = node.children[{i}].lexema")
                                 else:
-                                    visitorLines.append(f"      {clean_name} = self.visit(node.children[{i}])")
-                            names = ','.join([f"{result[s.simbolo]} " for s in sequencia])
-                            visitorLines.append(f"      return {names}")
+                                    visitorLines.append(f"    {clean_name} = self.visit(node.children[{i}])")
+                            #names = ','.join([f"{result[s.simbolo]} " for s in sequencia])
+                            visitorLines.append(f"    return self.visit_gen(node)")
         if tem_epsilon:
-                visitorLines.append(f"      return '' # Caso Epsilon")
+                visitorLines.append(f"    return None # Caso Epsilon")
         visitorLines.append("")
                         
 

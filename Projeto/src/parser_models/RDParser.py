@@ -31,18 +31,18 @@ class Node:
 tokens = (
     'INT',
     'ID',
-    'RBRACK',
     'COMMA',
+    'RBRACK',
     'LBRACK',
 )
 
 # Símbolos fixos (Variáveis têm precedência por ordem de tamanho de regex)
-def t_RBRACK(t):
-    r'\]'
-    return t
-
 def t_COMMA(t):
     r','
+    return t
+
+def t_RBRACK(t):
+    r'\]'
     return t
 
 def t_LBRACK(t):
@@ -73,8 +73,8 @@ Mapeamento para tokens simples
 '(': LPAREN, etc.
 
 simpleT_map = {
-    'RBRACK': ']',
     'COMMA': ',',
+    'RBRACK': ']',
     'LBRACK': '['
 }
 '''
@@ -120,7 +120,7 @@ def p_Lista():
 
 def p_Elems():
     '''Elems : Elem Resto | ε '''
-    if type_actual == 'ID' or type_actual == 'INT':
+    if type_actual == 'INT' or type_actual == 'ID':
         children = []
         children.append(p_Elem())
         children.append(p_Resto())
@@ -160,7 +160,6 @@ def p_Elem():
 def parser_gram(info):
     global token_stream, token_pos, type_actual, lex_actual
     token_stream = tokenizer(info)
-    print(token_stream)
     token_pos = 0
     lexer.lineno = 1
     type_actual, lex_actual = token_stream[0]
@@ -181,6 +180,7 @@ def main():
         result.pretty_print()
     except Exception as e:
         print(f'Erro durante o parsing: {e}')
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()

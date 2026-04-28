@@ -29,18 +29,18 @@ class Node:
 tokens = (
     'INT',
     'ID',
-    'RBRACK',
     'COMMA',
+    'RBRACK',
     'LBRACK',
 )
 
 # Símbolos fixos (Variáveis têm precedência por ordem de tamanho de regex)
-def t_RBRACK(t):
-    r'\]'
-    return t
-
 def t_COMMA(t):
     r','
+    return t
+
+def t_RBRACK(t):
+    r'\]'
     return t
 
 def t_LBRACK(t):
@@ -71,8 +71,8 @@ Mapeamento para tokens simples
 '(': LPAREN, etc.
 
 simpleT_map = {
-    'RBRACK': ']',
     'COMMA': ',',
+    'RBRACK': ']',
     'LBRACK': '['
 }
 '''
@@ -83,8 +83,8 @@ table_formatada = {
     },
 
     'Elems': {
-        'ID': ['Elem', 'Resto'],
         'INT': ['Elem', 'Resto'],
+        'ID': ['Elem', 'Resto'],
         'RBRACK': [],
     },
 
@@ -174,6 +174,7 @@ def main():
         result.pretty_print()
     except Exception as e:
         print(f'Erro durante o parsing: {e}')
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()
