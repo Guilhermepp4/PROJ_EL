@@ -1,5 +1,7 @@
 import sys
 import os
+import tempfile
+from parser_models.TDownParser import parser_gram as parser_gram_TDown
 from parser_grammar import parser_gram
 from parser_rec import gera_parser_recursivo
 from parser_table import gera_parser_TopDown
@@ -51,6 +53,8 @@ ID = /[A-Za-z]+/
 # ElsePart -> 'else' Stmt | ε
 # """
 
+INPUT_EXAMPLES = """[2, 3, 4]"""
+
 def processarAST(info):
     print("-------- A processar gramática --------")
     resultado_ast = parser_gram(info)
@@ -100,7 +104,7 @@ def makeFile(path, content, value):
     except Exception as e:
             print(f"❗️ Error: {e} -> Não foi possivel escrever nem guardar o ficheiro {path}")
 
-def exec_pipeline(info):
+def exec_pipeline(info, input_examples):
     print("Welcome to Grammar Playground\n")
     print("1º PASSO - Desenvolver AST\n")
     resultado_ast = processarAST(info)
@@ -144,7 +148,22 @@ def exec_pipeline(info):
     makeFile("parser_models/Visitor.py", visitor_content, "Visitor")
 
     print("\n6º PASSO - Testar a função de visita com input\n")
+    if visitor_content:        
+        tree = parser_gram_TDown(input_examples.strip())
 
+        vis_ns = {}
+        exec(visitor_content, vis_ns)
+        CodeGen = vis_ns['CodeGen']
+        try:
+
+            result = CodeGen().visit(tree)
+            print(f"Arvore de derivação para o input: {input_examples}")
+
+            tree.pretty_print()
+            print(f"Resultado da visita: {result}")
+        except Exception as e:
+            print(f"❗️ Erro: {e} -> Não foi possível executar a função de visita")
+    
     print("Pipeline concluída com sucesso! 🎉\n")
 
 
@@ -163,5 +182,5 @@ if __name__ == '__main__':
     else:
         print("❌ Não foi detetada nenhuma gramática ❌")
         print("Processar a gramática de exemplo\n") 
-        exec_pipeline(GRAMMAR_EXAMPLE)  
+        exec_pipeline(GRAMMAR_EXAMPLE, input_examples=INPUT_EXAMPLES)  
     

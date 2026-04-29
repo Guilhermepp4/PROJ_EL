@@ -8,7 +8,7 @@ class VisitorBase:
     if node.lexema is not None:
        return node.lexema
 
-    method_name = 'visit_' + node.label
+    method_name = 'visit_' + node.name
     method = getattr(self, method_name)
     return method(node)
 
@@ -20,7 +20,7 @@ class VisitorBase:
       if result is not None and str(result).strip():
          partes.append(result)
 
-    return ' '.join(partes)
+    return ' '.join(map(str,partes))
 
 class CodeGen(VisitorBase):
   def visit_Lista(self, node):
@@ -30,7 +30,7 @@ class CodeGen(VisitorBase):
     return self.visit_gen(node)
 
   def visit_Elems(self, node):
-    if len(node.children) == 2 and node.children[0].label == 'Elem':
+    if len(node.children) == 2 and node.children[0].name == 'Elem':
       elem = self.visit(node.children[0])
       resto = self.visit(node.children[1])
       return self.visit_gen(node)
@@ -38,7 +38,7 @@ class CodeGen(VisitorBase):
     return None # Caso Epsilon
 
   def visit_Resto(self, node):
-    if len(node.children) == 3 and node.children[0].label == ',':
+    if len(node.children) == 3 and node.children[0].name == ',':
       comma = node.children[0].lexema
       elem = self.visit(node.children[1])
       resto = self.visit(node.children[2])
@@ -47,11 +47,11 @@ class CodeGen(VisitorBase):
     return None # Caso Epsilon
 
   def visit_Elem(self, node):
-    if len(node.children) == 1 and node.children[0].label == 'INT':
+    if len(node.children) == 1 and node.children[0].name == 'INT':
       int = node.children[0].lexema
       return self.visit_gen(node)
 
-    elif len(node.children) == 1 and node.children[0].label == 'ID':
+    elif len(node.children) == 1 and node.children[0].name == 'ID':
       id = node.children[0].lexema
       return self.visit_gen(node)
 

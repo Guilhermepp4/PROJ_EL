@@ -50,7 +50,7 @@ def gera_visitor(grammar):
     visitorLines.append("    if node.lexema is not None:")
     visitorLines.append("       return node.lexema")
     visitorLines.append("")
-    visitorLines.append("    method_name = 'visit_' + node.label")
+    visitorLines.append("    method_name = 'visit_' + node.name")
     visitorLines.append("    method = getattr(self, method_name)")
     visitorLines.append("    return method(node)")
     visitorLines.append("")
@@ -62,7 +62,7 @@ def gera_visitor(grammar):
     visitorLines.append("      if result is not None and str(result).strip():")
     visitorLines.append("         partes.append(result)")
     visitorLines.append("")
-    visitorLines.append("    return ' '.join(partes)")    
+    visitorLines.append("    return ' '.join(map(str,partes))")    
     visitorLines.append("")
     visitorLines.append("class CodeGen(VisitorBase):")
     
@@ -84,7 +84,7 @@ def gera_visitor(grammar):
                         if producao.simbolo.simbolo != 'ε':
                             if i == 0:
                                 tamanho = len(sequencia)
-                                visitorLines.append(f"    if len(node.children) == {tamanho} and node.children[0].label == '{producao.simbolo.simbolo}':")
+                                visitorLines.append(f"    if len(node.children) == {tamanho} and node.children[0].name == '{producao.simbolo.simbolo}':")
                                 for i, s in enumerate(sequencia):
                                     clean_name = result[s.simbolo]
                                     if s.simbolo in terminals:
@@ -96,7 +96,7 @@ def gera_visitor(grammar):
                                 visitorLines.append(f"")
                             else:
                                 tamanho = len(sequencia)
-                                visitorLines.append(f"    elif len(node.children) == {tamanho} and node.children[0].label == '{producao.simbolo.simbolo}':")
+                                visitorLines.append(f"    elif len(node.children) == {tamanho} and node.children[0].name == '{producao.simbolo.simbolo}':")
                                 for i, s in enumerate(sequencia):
                                     clean_name = result[s.simbolo]
                                     if s.simbolo in terminals:
