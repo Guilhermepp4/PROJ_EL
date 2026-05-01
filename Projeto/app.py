@@ -7,7 +7,10 @@ import subprocess
 import sys
 import tempfile
 import os
+import uuid
+import importlib.util
 
+sys.dont_write_bytecode = True
 sys.path.insert(0, 'src')
 
 from classes_parser import (Init, Regra, Producoes)
@@ -16,6 +19,7 @@ from parser_grammar import parser_gram
 from main import conflitos, GRAMMAR_EXAMPLE
 from parser_table import gera_parser_TopDown
 from parser_rec import gera_parser_recursivo
+from my_visitor import gera_visitor
 
 app = Flask(__name__)
 
@@ -25,8 +29,7 @@ data_iso = data_hora_local.strftime('"%Y-%m-%dT%H:%M:%S')
 app.secret_key = 'uma_chave'
 
 
-def gerar_codigo_do_parser(grammar, type):
-    parser_grama = parser_gram(grammar)
+def gerar_codigo_do_parser(parser_grama, type):
     first = compute_first(parser_grama)
     follow = compute_follow(first, parser_grama)
     if type == 'Table':
@@ -186,6 +189,15 @@ def generate_parser():
         
     return response
 
+@app.route('/set_mode/visitor')
+def set_mode_visitor():
+    session['mode'] = 'visitor'
+    return redirect('/test')
+
+@app.route('/set_mode/parsing')
+def set_mode_parsing():
+    session['mode'] = 'parsing'
+    return redirect('/test')
 
 @app.route('/test')
 def test_page():
@@ -193,10 +205,12 @@ def test_page():
 
 @app.route('/run_test', methods=['POST'])
 def run_test():
+    gramma = session.get('grammar_text')
     parser_type = request.form.get('parser_type')
     test_input = request.form.get('test_input', '').strip()
-
-    codigo_gerado = gerar_codigo_do_parser(session.get('grammar_text'), parser_type)
+    
+    parser_gramma = parser_gram(gramma)
+    codigo_gerado = gerar_codigo_do_parser(parser_gramma, parser_type)
 
     # 2. Criar um ficheiro temporário para o código e outro para o input
     with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode='w', encoding='utf-8') as pf:
@@ -239,15 +253,93 @@ def run_test():
 
     return render_template("test.html", resultado=resultado, last_input=test_input)
 
-@app.route('/set_mode/visitor')
-def set_mode_visitor():
-    session['mode'] = 'visitor'
-    return redirect('/test')
+@app.route('/generate_visitor', methods=['POST'])
+def generate_visitor():
+    print("HeRE")
+    grammar_text = session.get('grammar_text')
+    file_name = request.form.get('file_name', '').strip()
 
-@app.route('/set_mode/parsing')
-def set_mode_parsing():
-    session['mode'] = 'parsing'
-    return redirect('/test')
+    if not grammar_text:
+        return redirect('/dashboard')
+    
+    grammar_obj = parser_gram(grammar_text)
+    if grammar_obj is None:
+        return "Erro: A gramática é inválida. Verifique o console."
+    
+    visitor_code = gera_visitor(grammar_obj)
+
+    response = make_response(visitor_code)
+    response.headers['Content-Disposition'] = f'attachment; filename={file_name}'
+    response.headers['Content-Type'] = 'text/x-python'
+        
+    return response
+
+@app.route('/run_visitor', methods=['POST'])
+def run_visitor():
+    grammar_t = session.get('grammar_text')
+    if not grammar_t:
+        return redirect('/dashboard')
+    print(grammar_t)
+    grammar = parser_gram(grammar_t)
+    if grammar is None:
+         return render_template("test.html", resultado={'status': 'error', 'error': 'Erro ao processar gramática.'})
+    
+    test_input = request.form.get('test_input', '').strip()
+    
+    codigo_gerado = gerar_codigo_do_parser(grammar, 'Table')
+    
+    unique_name = f"visitor_parser_{uuid.uuid4().hex}"
+    
+    with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode='w', encoding='utf-8') as pf:
+        pf.write(codigo_gerado)
+        path_parser = pf.name
+
+    try:
+        spec = importlib.util.spec_from_file_location(unique_name, path_parser)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[unique_name] = module
+        spec.loader.exec_module(module)
+        
+        tree_object = module.parser_gramTD(test_input)
+        visitor_content = gera_visitor(grammar)        
+        vis_ns = {}
+        
+        exec(visitor_content, vis_ns)
+        CodeGen = vis_ns.get('CodeGen')
+
+        if not CodeGen:
+            raise Exception("Classe CodeGen não encontrada no código do Visitor.")
+
+        visitor_result = CodeGen().visit(tree_object)
+
+        f = io.StringIO()
+        with redirect_stdout(f):
+            tree_object.pretty_print()
+        tree_visual = f.getvalue()
+
+        resultado = {
+            'status': 'success',
+            'output': 'Program\n'+tree_visual,
+            'output_visitor': visitor_result
+        }
+
+    except Exception as e:
+        resultado = {
+            'status': 'error', 
+            'error': f"Erro na execução: {str(e)}"
+        }
+
+    finally:
+        # 7. Limpeza absoluta
+        if os.path.exists(path_parser):
+            try:
+                os.remove(path_parser)
+                if "dynamic_parser" in sys.modules:
+                    del sys.modules["dynamic_parser"]
+            except:
+                pass
+
+    return render_template("test.html", resultado=resultado, last_input=test_input)
 
 if __name__ == '__main__':
     app.run(debug = True)

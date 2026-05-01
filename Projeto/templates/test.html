@@ -20,7 +20,7 @@
                 </div>
                 <div class="w3-padding-16">
                     {% if session.get('mode') == 'visitor' %}
-                        <from action="/run_visitor" method="POST">
+                        <form action="/run_visitor" method="POST">
                             <div class="w3-panel w3-pale-yellow w3-leftbar w3-border-yellow">
                                 <h3><i class="fa fa-info-circle"></i> Execução via Visitor</h3>
                                 <p>Neste modo, o sistema utiliza o padrão <b>Visitor</b> para percorrer a árvore sintática e processar os dados. Insira uma frase válida para ver o resultado da computação.</p>
@@ -30,9 +30,27 @@
                                         style="height: 150px; font-family: monospace;" 
                                         placeholder='Exemplo: [ 1, 2, 3]'></textarea>
                             <button type="submit" class="w3-button w3-blue-grey w3-block w3-round-large w3-margin-top">
-                                <i class="fa fa-play w3-margin-right"></i>Executar Parsing
+                                <i class="fa fa-play w3-margin-right"></i>Executar
                             </button>
-                        </from>
+                        </form>
+                        <hr style="border-top: 1px dashed #ccc;">
+                        <div class="w3-container w3-light-grey w3-round-large w3-padding-16">
+                            <h5 class="w3-small"><b><i class="fa fa-download"></i> Exportar Código do Visitor</b></h5>
+                            <form action="/generate_visitor" method="POST">
+                                <input type="hidden" name="action_id" value="Visitor">
+                                <div class="w3-row-padding">
+                                    <div class="w3-col s8">
+                                        <input type="text" name="file_name" class="w3-input w3-border w3-round" 
+                                               placeholder="nome_do_ficheiro" value="visitor_logic.py">
+                                    </div>
+                                    <div class="w3-col s4">
+                                        <button type="submit" class="w3-button w3-blue-grey w3-round w3-block">
+                                            <i class="fa fa-save"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     {% else %}
                         <form id="testForm" action="/run_test" method="POST">
                             <div class="w3-panel w3-pale-yellow w3-leftbar w3-border-yellow">
@@ -51,7 +69,7 @@
                                 <label><b>2. Frase de Entrada:</b></label>
                                 <textarea name="test_input" class="w3-input w3-border w3-round" 
                                         style="height: 150px; font-family: monospace;" 
-                                        placeholder='Exemplo: [ INT , INT ]'></textarea>
+                                        placeholder='Exemplo: [ 1, 2, 3 ]'></textarea>
                             </div>
 
                             <button type="submit" class="w3-button w3-blue-grey w3-block w3-round-large w3-margin-top">
@@ -72,18 +90,42 @@
                             <h3>Frase Aceite!</h3>
                             <p>A sequência de tokens é válida para a gramática atual.</p>
                         </div>
-                        <div class="w3-card-4 w3-white w3-margin-top">
-                            <header class="w3-container w3-dark-grey">
-                                <h5><b>Árvore de Derivação</b></h5>
+                        <div class="w3-card-4 w3-white w3-margin-top w3-round-large" style="overflow: hidden;">
+                            <header class="w3-container w3-indigo w3-padding">
+                                <h5 class="w3-margin-none"><i class="fa fa-sitemap w3-margin-right"></i><b>Análise e Resultados</b></h5>
                             </header>
-                            <div class="w3-container w3-padding">
-                                <pre style="font-family: 'Courier New', monospace; 
-                                        background-color: #f4f4f4; 
-                                        padding: 15px; 
-                                        border-radius: 5px;
-                                        line-height: 1.2;
-                                        overflow-x: auto;">{{ resultado.output }}</pre>
+                        
+                            <div class="w3-container w3-padding-16">
+                                <div class="w3-margin-bottom">
+                                    <label class="w3-text-grey w3-small"><b>ESTRUTURA SINTÁTICA (AST)</b></label>
+                                    <div class="w3-light-grey w3-padding w3-round w3-border" style="position: relative;">
+                                        <pre style="font-family: 'Fira Code', 'Courier New', monospace; 
+                                                   font-size: 13px;
+                                                   margin: 0;
+                                                   line-height: 1.4;
+                                                   overflow-x: auto;
+                                                   color: #2c3e50;">{{ resultado.output }}</pre>
+                                        <span class="w3-tag w3-tiny w3-display-topright w3-grey w3-round">tree</span>
+                                    </div>
+                                </div>
+                                {% if session.get('mode') == 'visitor' %}
+                                    <div class="w3-animate-bottom">
+                                        <label class="w3-text-indigo w3-small"><b>RESULTADO DA EXECUÇÃO (VISITOR)</b></label>
+                                        <div class="w3-panel w3-pale-blue w3-leftbar w3-border-indigo w3-padding-16 w3-round-right">
+                                            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 18px;">
+                                                <i class="fa fa-terminal w3-text-indigo w3-margin-right"></i>
+                                                <code class="w3-text-dark-grey" style="font-weight: bold;">
+                                                    {{ resultado.output_visitor if resultado.output_visitor else 'Sem retorno' }}
+                                                </code>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
                             </div>
+                        
+                            <footer class="w3-container w3-light-grey w3-center w3-padding-small">
+                                <span class="w3-tiny w3-text-grey">Processado com sucesso pelo motor dinâmico</span>
+                            </footer>
                         </div>
                     {% else %}
                         <div class="w3-panel w3-pale-red w3-leftbar w3-border-red">
@@ -117,7 +159,10 @@
         </div>
     </div>
     <div class="w3-center">
-        <p><a href="/start" class="w3-text-blue-grey w3-hover-text-black" style="text-decoration: none;"><i class="fa fa-home"></i> Voltar</a></p>
+        <p><a href="/start" class="w3-text-blue-grey w3-hover-text-black" style="text-decoration: none;"><i class="fa fa-home"></i> Voltar ao início</a></p>
     </div>
+    <p class="w3-center w3-text-blue-grey w3-margin-top w3-opacity">
+        Created for Project Languages Engineering class &bull; 2026
+    </p>
 </div>
 {% endblock %}

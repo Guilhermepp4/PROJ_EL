@@ -1,5 +1,5 @@
 import ply.yacc as yacc
-from my_lexer import lexer, tokens
+from my_lexer import lexer as lexer_global
 from classes_parser import (Init, Regra, Producoes, 
                             Simbolo, token)
 
@@ -108,11 +108,12 @@ def p_error(p):
     else:
         print("Erro sintático no fim do ficheiro!")
 
-parser = yacc.yacc(start='init')
-
 def parser_gram(info):
-    lexer.lineno = 1
-    result = parser.parse(info)
+    local_parser = yacc.yacc(start='init', write_tables=False, debug=False)
+    
+    lexer_global.lineno = 1
+
+    result = local_parser.parse(info, lexer=lexer_global)
 
     if not result:
         return None

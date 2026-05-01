@@ -1,7 +1,6 @@
 import sys
 import os
 import tempfile
-from parser_models.TDownParser import parser_gram as parser_gram_TDown
 from parser_grammar import parser_gram
 from parser_rec import gera_parser_recursivo
 from parser_table import gera_parser_TopDown
@@ -148,21 +147,21 @@ def exec_pipeline(info, input_examples):
     makeFile("parser_models/Visitor.py", visitor_content, "Visitor")
 
     print("\n6º PASSO - Testar a função de visita com input\n")
-    if visitor_content:        
-        tree = parser_gram_TDown(input_examples.strip())
+    # if visitor_content:        
+    #     tree = parser_gram_TDown(input_examples.strip())
 
-        vis_ns = {}
-        exec(visitor_content, vis_ns)
-        CodeGen = vis_ns['CodeGen']
-        try:
+    #     vis_ns = {}
+    #     exec(visitor_content, vis_ns)
+    #     CodeGen = vis_ns['CodeGen']
+    #     try:
 
-            result = CodeGen().visit(tree)
-            print(f"Arvore de derivação para o input: {input_examples}")
+    #         result = CodeGen().visit(tree)
+    #         print(f"Arvore de derivação para o input: {input_examples}")
 
-            tree.pretty_print()
-            print(f"Resultado da visita: {result}")
-        except Exception as e:
-            print(f"❗️ Erro: {e} -> Não foi possível executar a função de visita")
+    #         tree.pretty_print()
+    #         print(f"Resultado da visita: {result}")
+    #     except Exception as e:
+    #         print(f"❗️ Erro: {e} -> Não foi possível executar a função de visita")
     
     print("Pipeline concluída com sucesso! 🎉\n")
 
