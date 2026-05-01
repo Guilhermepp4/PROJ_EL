@@ -1,5 +1,5 @@
 import ply.yacc as yacc
-from my_lexer import lexer as lexer_global
+from my_lexer import lexer as lexer_global, tokens
 from classes_parser import (Init, Regra, Producoes, 
                             Simbolo, token)
 

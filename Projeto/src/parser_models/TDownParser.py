@@ -29,18 +29,18 @@ class Node:
 tokens = (
     'INT',
     'ID',
-    'LBRACK',
     'RBRACK',
+    'LBRACK',
     'COMMA',
 )
 
 # Símbolos fixos (Variáveis têm precedência por ordem de tamanho de regex)
-def t_LBRACK(t):
-    r'\['
-    return t
-
 def t_RBRACK(t):
     r'\]'
+    return t
+
+def t_LBRACK(t):
+    r'\['
     return t
 
 def t_COMMA(t):
@@ -71,8 +71,8 @@ Mapeamento para tokens simples
 '(': LPAREN, etc.
 
 simpleT_map = {
-    'LBRACK': '[',
     'RBRACK': ']',
+    'LBRACK': '[',
     'COMMA': ','
 }
 '''
@@ -83,8 +83,8 @@ table_formatada = {
     },
 
     'Elems': {
-        'ID': ['Elem', 'Resto'],
         'INT': ['Elem', 'Resto'],
+        'ID': ['Elem', 'Resto'],
         'RBRACK': [],
     },
 
@@ -125,7 +125,7 @@ token_pos = 0 # Posição atual no token_stream
 type_actual = None # Tipo do token atual
 lex_actual = None # Lexema do token atual
 
-def parser_gram(info):
+def parser_gramTD(info):
     global token_stream, token_pos, type_actual, lex_actual
     token_stream = tokenizer(info)
     token_pos = 0
@@ -170,13 +170,11 @@ def main():
     else:
         print("No input file provided. Using default test string.")
     try:
-        result = parser_gram(source)
+        result = parser_gramTD(source)
         result.pretty_print()
     except Exception as e:
         print(f'Erro durante o parsing: {e}')
         sys.exit(1)
-    
-    return result
 
 if __name__ == '__main__':
     main()

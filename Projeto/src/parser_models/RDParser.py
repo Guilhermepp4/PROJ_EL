@@ -31,18 +31,18 @@ class Node:
 tokens = (
     'INT',
     'ID',
-    'LBRACK',
     'RBRACK',
+    'LBRACK',
     'COMMA',
 )
 
 # Símbolos fixos (Variáveis têm precedência por ordem de tamanho de regex)
-def t_LBRACK(t):
-    r'\['
-    return t
-
 def t_RBRACK(t):
     r'\]'
+    return t
+
+def t_LBRACK(t):
+    r'\['
     return t
 
 def t_COMMA(t):
@@ -73,8 +73,8 @@ Mapeamento para tokens simples
 '(': LPAREN, etc.
 
 simpleT_map = {
-    'LBRACK': '[',
     'RBRACK': ']',
+    'LBRACK': '[',
     'COMMA': ','
 }
 '''
@@ -120,7 +120,7 @@ def p_Lista():
 
 def p_Elems():
     '''Elems : Elem Resto | ε '''
-    if type_actual == 'ID' or type_actual == 'INT':
+    if type_actual == 'INT' or type_actual == 'ID':
         children = []
         children.append(p_Elem())
         children.append(p_Resto())
