@@ -20,6 +20,7 @@ from main import conflitos, GRAMMAR_EXAMPLE
 from parser_table import gera_parser_TopDown
 from parser_rec import gera_parser_recursivo
 from my_visitor import gera_visitor
+from ontology import generate_ontology
 
 app = Flask(__name__)
 
@@ -199,6 +200,11 @@ def set_mode_parsing():
     session['mode'] = 'parsing'
     return redirect('/test')
 
+@app.route('/set_mode/ontology')
+def set_mode_ontology():
+    session['mode'] = 'ontology'
+    return redirect('/test')
+
 @app.route('/test')
 def test_page():
     return render_template("test.html")
@@ -340,6 +346,31 @@ def run_visitor():
                 pass
 
     return render_template("test.html", resultado=resultado, last_input=test_input)
+
+@app.route('/generate_ontology', methods=['POST'])
+def generateOntology():
+    grammar_text = session.get('grammar_text')
+    file_name = request.form.get('file_name', '').strip()
+
+    if not grammar_text:
+        return redirect('/dashboard')
+    
+    grammar_obj = parser_gram(grammar_text)
+    if grammar_obj is None:
+        return "Erro: A gramática é inválida. Verifique o console."
+    
+    first = compute_first(grammar_obj)
+    follow = compute_follow(first, grammar_obj)
+    
+    _, lista_conflitos = checkLL1(grammar_obj, first, follow)
+
+    ontology_code = generate_ontology(grammar_obj, file_name, lista_conflitos, first, follow)
+
+    response = make_response(ontology_code)
+    response.headers['Content-Disposition'] = f'attachment; filename={file_name}'
+    response.headers['Content-Type'] = 'text/x-python'
+        
+    return response
 
 if __name__ == '__main__':
     app.run(debug = True)
