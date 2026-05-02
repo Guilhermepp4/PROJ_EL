@@ -32,7 +32,7 @@ def generate_ontology(grammar, grammar_name, conflitos, first, follow):
     if terminals:
         ontology_lines.append(f"    :hasTerminals {', '.join([f':T_{t}' for t in terminals])} ;")
 
-    ontology_lines.append(f"    :hasProductions {', '.join([f':P_{_norm(nt.cabeca)}' for nt in roles])} ;")
+    ontology_lines.append(f"    :hasRoles {', '.join([f':R_{_norm(nt.cabeca)}' for nt in roles])} ;")
 
     if conflitos:
         ontology_lines.append(f"    :hasConflicts {', '.join([f':Conflict_{_norm(c)}' for c in conflitos])} .")  
@@ -60,4 +60,73 @@ def generate_ontology(grammar, grammar_name, conflitos, first, follow):
         # ontology_lines.append(f"    :hasRegex :Reg{regex} .")
         ontology_lines.append("")
     
+
+    ontology_lines.append(f"# Conjunto First")
+    for nt in non_terminals:
+        fid=f":first_{_norm(nt)}"
+        first_members = sorted(first.get(nt, set()))
+        ontology_lines.append(f"{fid} a :FirstSet ;")
+        if first_members:
+            firsts = []
+            for m in first_members:
+                if m == 'ε':
+                    firsts.append(":epsilon")
+                elif m in terminals:
+                    firsts.append(f":T_{_norm(m)}")
+                else:
+                    firsts.append(f":NT_{_norm(m)}")
+            ontology_lines.append(f"    :hasMembers {', '.join(firsts)} .")
+        ontology_lines.append("")
+
+    ontology_lines.append(f"# Conjunto Follow")
+    for nt in non_terminals:
+        fod=f":follow_{_norm(nt)}"
+        follow_members = sorted(follow.get(nt, set()))
+        ontology_lines.append(f"{fod} a :FollowSet ;")
+        if follow_members:
+            follows = []
+            for m in follow_members:
+                if m == 'ε':
+                    firsts.append(":epsilon")
+                elif m in terminals:
+                    firsts.append(f":T_{_norm(m)}")
+                else:
+                    firsts.append(f":NT_{_norm(m)}")
+            ontology_lines.append(f"    :hasMembers {', '.join(firsts)} .")
+        ontology_lines.append("")
+    
+    ontology_lines.append(f"# Roles")
+    
+    for rule in roles:
+        head = f"{_norm(rule.cabeca)}"
+        pid = f":R_{head}"
+        
+        producoes = []
+        for i, prod in enumerate(rule.producoes):
+            prod_id = f":P_{head}_{i}"
+            producoes.append(prod_id)
+        
+        ontology_lines.append(f"{pid} a :Role ;")
+        ontology_lines.append(f"    :hasHead :NT_{_norm(rule.cabeca)} ;")
+        if prod:
+            ontology_lines.append(f"    :hasProductions {', '.join(producoes)} .")
+        ontology_lines.append("")
+
+        for i, prod in enumerate(rule.producoes):
+            prodid = f":P_{head}_{i}"
+            its_null= prod == ['ε']
+            ontology_lines.append(f"{prodid} a :Production ;")
+            sequencia = [prod.simbolo] + prod.listaSimbolos
+            if not its_null:
+                ontology_lines.append(f"    :hasSymbols {', '.join([f':T_{_norm(s.simbolo)}' if s.simbolo in terminals else f':NT_{_norm(s.simbolo)}' for s in sequencia])} .")
+            else:
+                ontology_lines.append(f"    :hasSymbols :epsilon .")
+            ontology_lines.append("")
+
+    if conflitos:
+        ontology_lines.append(f"# Conflitos")
+        for c in conflitos:
+            cid = f":Conflict_{_norm(c)}"
+            ontology_lines.append(f"{cid} a :Conflict ;")
+            ontology_lines.append(f"    :description '{c}' .")
     return '\n'.join(ontology_lines)
