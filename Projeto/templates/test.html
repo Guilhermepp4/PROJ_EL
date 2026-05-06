@@ -22,17 +22,109 @@
                 <div class="w3-padding-16">
                     {% if session.get('mode') == 'visitor' %}
                         <form action="/run_visitor" method="POST">
+                            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
+                            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/theme/dracula.min.css">
+                            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.js"></script>
+                            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/python/python.min.js"></script>
+                            
                             <div class="w3-panel w3-pale-blue w3-leftbar w3-border-indigo">
                                 <h3><i class="fa fa-info-circle"></i> Execução via Visitor</h3>
                                 <p>Neste modo, o sistema utiliza o padrão <b>Visitor</b> para percorrer a árvore sintática e processar os dados. Insira uma frase válida para ver o resultado da computação.</p>
                             </div>
+                            
+                            <div class="w3-margin-bottom">
+                                <div class="w3-row">
+                                    <div class="w3-col s8">
+                                        <label><b>1. Código do Visitor (Python)</b></label>
+                                    </div>
+                                    
+                                    <div class="w3-col s4 w3-right-align">
+                                        <button type="button" onclick="carregarCodigoGerado()" class="w3-button w3-light-grey w3-tiny w3-margin-top w3-round">
+                                            <i class="fa fa-magic"></i> Restaurar Código Original
+                                        </button>
+                                    </div>
+                                </div>
+                            
+                                <div class="w3-border w3-round w3-margin-top" style="overflow: hidden;">
+                                    <textarea id="visitor-editor" name="visitor_code">{{ visitor_content }}</textarea>
+                                </div>
+                            </div>
+                        
                             <label><b>1. Input para o Visitor</b></label>
                             <textarea name="test_input" class="w3-input w3-border w3-round" 
-                                        style="height: 150px; font-family: monospace;" 
-                                        placeholder='Exemplo: [ 1, 2, 3]'></textarea>
-                            <button type="submit" class="w3-button w3-indigo w3-block w3-round-large w3-margin-top">
-                                <i class="fa fa-play w3-margin-right"></i>Executar
-                            </button>
+                                            style="height: 150px; font-family: monospace;" 
+                                            placeholder='Exemplo: [ 1, 2, 3]'>{{ last_input }}</textarea>
+                                <button type="submit" class="w3-button w3-indigo w3-block w3-round-large w3-margin-top">
+                                    <i class="fa fa-play w3-margin-right"></i>Executar
+                                </button>
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                            <script>
+                                var editor = CodeMirror.fromTextArea(document.getElementById("visitor-editor"), {
+                                    mode: "python",
+                                    theme: "dracula",
+                                    lineNumbers: true,
+                                    indentUnit: 4,
+                                    viewportMargin: Infinity
+                                });
+                                editor.setSize("100%", "400px");
+                
+                                // 3. FORÇAR REFRESH PARA O TEXTO APARECER
+                                setTimeout(function() {
+                                    editor.refresh();
+                                }, 200);
+                
+                                function syncCode() {
+                                    var val = editor.getValue();
+                                    // Coloca o valor do editor no input hidden para o Flask receber
+                                    document.getElementById('hidden_code').value = val;
+                                }
+                
+                                function carregarCodigoGerado() {
+                                    fetch('/generate_visitor_to_ui', { method: 'POST' })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.status === 'success') {
+                                            const codigoDoServidor = data.code.trim();
+                                            const codigoNoEditor = editor.getValue().trim();
+                                            
+                                            if (codigoDoServidor !== codigoNoEditor) {
+                                                Swal.fire({
+                                                title: 'Tens a certeza?',
+                                                text: 'Isto vai apagar todas as tuas alterações no código do Visitor!',
+                                                icon: 'warning',
+                                                showCancelButton: true,
+                                                confirmButtonColor: '#3f51b5',
+                                                cancelButtonColor: '#d33',
+                                                cancelButtonText: 'Cancelar',
+                                                confirmButtonText: 'Sim restaurar'
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        editor.setValue(data.code);
+                                                        Swal.fire(
+                                                        'Restaurado!',
+                                                        'O código original foi carregado.',
+                                                        'success'    
+                                                        );
+                                                    }
+                                                });
+
+                                            } else {
+                                                Swal.fire({
+                                                title: 'Tudo atualizado!',
+                                                text: 'O código já corresponde ao original.',
+                                                icon: 'info',
+                                                confirmButtonText: 'Entendido',
+                                                confirmButtonColor: '#3f51b5' // Cor indigo que estás a usar
+                                                });
+                                            }
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Erro:', error);
+                                        alert("Erro ao comunicar com o servidor.");
+                                    });
+                                }
+                            </script>
                         </form>
                         <hr style="border-top: 1px dashed #ccc;">
                         <div class="w3-container w3-light-grey w3-round-large w3-padding-16">

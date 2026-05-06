@@ -1,7 +1,7 @@
 import io
 import re
 from contextlib import redirect_stdout
-from flask import Flask, render_template, request, session, redirect, make_response
+from flask import Flask, render_template, request, session, redirect, make_response, jsonify
 from datetime import datetime
 import subprocess
 import sys
@@ -190,25 +190,27 @@ def generate_parser():
         
     return response
 
-@app.route('/set_mode/visitor')
-def set_mode_visitor():
-    session['mode'] = 'visitor'
-    return redirect('/test')
-
-@app.route('/set_mode/parsing')
-def set_mode_parsing():
-    session['mode'] = 'parsing'
-    return redirect('/test')
-
-@app.route('/set_mode/ontology')
-def set_mode_ontology():
-    session['mode'] = 'ontology'
+@app.route('/set_mode/<mode>')
+def set_mode(mode):
+    session['mode'] = mode
     return redirect('/test')
 
 @app.route('/test')
 def test_page():
-    return render_template("test.html")
+    mode = session.get('mode', 'parsing')
+    grammar_text = session.get('grammar_text')
+    
+    context = {
+        'visitor_content': "",
+        'resultado': None
+    }
 
+    if mode == 'visitor' and grammar_text:
+        grammar_obj = parser_gram(grammar_text)
+        context['visitor_content'] = gera_visitor(grammar_obj)
+
+    return render_template("test.html", **context)
+    
 @app.route('/run_test', methods=['POST'])
 def run_test():
     gramma = session.get('grammar_text')
@@ -259,9 +261,20 @@ def run_test():
 
     return render_template("test.html", resultado=resultado, last_input=test_input)
 
+
+@app.route('/generate_visitor_to_ui', methods=['POST'])
+def generate_visitor_to_ui():
+    grammar_text = session.get('grammar_text')
+    if not grammar_text:
+        return jsonify({'status': 'error', 'message': 'Sem gramática'})
+
+    grammar_obj = parser_gram(grammar_text)
+    visitor_code = gera_visitor(grammar_obj)    
+    return jsonify({'status': 'success', 'code': visitor_code})
+
+
 @app.route('/generate_visitor', methods=['POST'])
 def generate_visitor():
-    print("HeRE")
     grammar_text = session.get('grammar_text')
     file_name = request.form.get('file_name', '').strip()
 
@@ -285,11 +298,11 @@ def run_visitor():
     grammar_t = session.get('grammar_text')
     if not grammar_t:
         return redirect('/dashboard')
-    print(grammar_t)
+    
     grammar = parser_gram(grammar_t)
     if grammar is None:
-         return render_template("test.html", resultado={'status': 'error', 'error': 'Erro ao processar gramática.'})
-    
+         return render_template("test.html", resultado={'status': 'error', 'error': 'Erro ao processar gramática.'}, visitor_content="")
+
     test_input = request.form.get('test_input', '').strip()
     
     codigo_gerado = gerar_codigo_do_parser(grammar, 'Table')
@@ -299,7 +312,14 @@ def run_visitor():
     with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode='w', encoding='utf-8') as pf:
         pf.write(codigo_gerado)
         path_parser = pf.name
-
+    
+    codigo_do_editor = request.form.get('visitor_code', '').strip()
+    
+    if codigo_do_editor:
+        visitor_content = codigo_do_editor
+    else:
+        visitor_content = gera_visitor(grammar)
+            
     try:
         spec = importlib.util.spec_from_file_location(unique_name, path_parser)
         module = importlib.util.module_from_spec(spec)
@@ -307,7 +327,6 @@ def run_visitor():
         spec.loader.exec_module(module)
         
         tree_object = module.parser_gramTD(test_input)
-        visitor_content = gera_visitor(grammar)        
         vis_ns = {}
         
         exec(visitor_content, vis_ns)
@@ -345,7 +364,7 @@ def run_visitor():
             except:
                 pass
 
-    return render_template("test.html", resultado=resultado, last_input=test_input)
+    return render_template("test.html", resultado=resultado, last_input=test_input, visitor_content=visitor_content)
 
 @app.route('/generate_ontology', methods=['POST'])
 def generateOntology():
