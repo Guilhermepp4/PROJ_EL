@@ -1,1 +1,12 @@
-[ 2, 3]
+Program : StmtList
+
+StmtList → Stmt StmtList_prime
+StmtList_prime → ';' Stmt StmtList_prime | ε
+Stmt → ID ':=' Expr
+Expr → Term Expr_prime
+Expr_prime → '+' Term Expr_prime | ε
+Term → ID | NUMBER
+
+NUMBER = /[0-9]+/
+
+ID = /[A-Za-z]+/

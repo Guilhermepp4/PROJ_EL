@@ -141,7 +141,7 @@ def gera_parser_recursivo(grammar, first_sets, follow_sets):
     parserLines.append("        if not tok:")
     parserLines.append("            break")
     parserLines.append("        token_stream.append((tok.type, tok.value))")    
-    parserLines.append("    token_stream.append(('final', 'final'))")
+    parserLines.append("    token_stream.append(('$', '$'))")
     parserLines.append("    return token_stream")
     
     parserLines.append("# Variáveis globais para o parser")
@@ -216,7 +216,7 @@ def gera_parser_recursivo(grammar, first_sets, follow_sets):
     parserLines.append("    lexer.lineno = 1")
     parserLines.append("    type_actual, lex_actual = token_stream[0]")
     parserLines.append(f"    result = p_{SimpleToken(start)}() ")    
-    parserLines.append("    if type_actual != 'final':")
+    parserLines.append("    if type_actual != '$':")
     parserLines.append('        raise SyntaxError(f"Tokens extra após o fim: {type_actual}")')
     parserLines.append("    return result")
     parserLines.append("")

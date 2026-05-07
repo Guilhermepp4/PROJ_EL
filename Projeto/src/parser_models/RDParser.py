@@ -31,22 +31,22 @@ class Node:
 tokens = (
     'INT',
     'ID',
+    'COMMA',
     'RBRACK',
     'LBRACK',
-    'COMMA',
 )
 
 # Símbolos fixos (Variáveis têm precedência por ordem de tamanho de regex)
+def t_COMMA(t):
+    r','
+    return t
+
 def t_RBRACK(t):
     r'\]'
     return t
 
 def t_LBRACK(t):
     r'\['
-    return t
-
-def t_COMMA(t):
-    r','
     return t
 
 def t_INT(t):
@@ -73,9 +73,9 @@ Mapeamento para tokens simples
 '(': LPAREN, etc.
 
 simpleT_map = {
+    'COMMA': ',',
     'RBRACK': ']',
-    'LBRACK': '[',
-    'COMMA': ','
+    'LBRACK': '['
 }
 '''
 
@@ -87,7 +87,7 @@ def tokenizer(info):
         if not tok:
             break
         token_stream.append((tok.type, tok.value))
-    token_stream.append(('final', 'final'))
+    token_stream.append(('$', '$'))
     return token_stream
 # Variáveis globais para o parser
 token_stream = [] # Lista global para armazenar os tokens
@@ -125,7 +125,7 @@ def p_Elems():
         children.append(p_Elem())
         children.append(p_Resto())
         return Node('Elems', children=children)
-    elif type_actual == 'RBRACK':
+    elif type_actual == 'RBRACK' or type_actual == '$':
         children = []
         children.append(Node('ε'))
         return Node('Elems', children=children)
@@ -139,7 +139,7 @@ def p_Resto():
         children.append(p_Elem())
         children.append(p_Resto())
         return Node('Resto', children=children)
-    elif type_actual == 'RBRACK':
+    elif type_actual == 'RBRACK' or type_actual == '$':
         children = []
         children.append(Node('ε'))
         return Node('Resto', children=children)
@@ -164,7 +164,7 @@ def parser_gram(info):
     lexer.lineno = 1
     type_actual, lex_actual = token_stream[0]
     result = p_Lista() 
-    if type_actual != 'final':
+    if type_actual != '$':
         raise SyntaxError(f"Tokens extra após o fim: {type_actual}")
     return result
 

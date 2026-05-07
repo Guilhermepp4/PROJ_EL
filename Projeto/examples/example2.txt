@@ -1,0 +1,6 @@
+Program : S
+
+S -> A 'a'
+    | 'b'
+A -> 'a' A
+    | 'c'

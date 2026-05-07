@@ -102,9 +102,12 @@ def gera_parser_TopDown(grammar, first, follow):
     for nt, sequencia in table.items():
         parserLines.append(f"    '{nt}': {{")
         for t, producao in sequencia.items():
-            t = formatar_simbolo(t)
-            if simpleT(t):
-                t = tokT(t[1:-1])
+            if t in ['$']:
+                t = '$'
+            else:
+                t = formatar_simbolo(t)
+                if simpleT(t):
+                    t = tokT(t[1:-1])
 
             if 'ε' == producao:
                 rhs = []
@@ -128,7 +131,7 @@ def gera_parser_TopDown(grammar, first, follow):
     parserLines.append("        if not tok:")
     parserLines.append("            break")
     parserLines.append("        token_stream.append((tok.type, tok.value))")    
-    parserLines.append("    token_stream.append(('final', 'final'))")
+    parserLines.append("    token_stream.append(('$', '$'))")
     parserLines.append("    return token_stream")
     parserLines.append("")
     

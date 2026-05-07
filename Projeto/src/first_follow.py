@@ -99,7 +99,7 @@ def simple_sequencia(sequencia, A, first, follow):
 
 
 def compute_follow(first, gramatica):
-    follow = {nt : set() for nt in gramatica.get_nonterminals()}
+    follow = {nt : set('$') for nt in gramatica.get_nonterminals()}
 
     changed = True
     while changed:

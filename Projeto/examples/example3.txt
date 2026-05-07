@@ -1,0 +1,14 @@
+Program : S
+
+S -> Exp '.'
+
+Exp -> INT
+    | '(' Funcao ')'
+
+Funcao -> '+' Lista
+    | '*' Lista
+
+Lista -> Exp Lista
+    |
+
+INT = /[0-9]+/
