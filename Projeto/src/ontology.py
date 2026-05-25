@@ -1,4 +1,6 @@
-NS = "http://rpcw.di.uminho.pt/2026/Proj_EL/"
+from help_parsers import tokT
+
+NS = "<http://rpcw.di.uminho.pt/2026/Proj_EL/> "
 
 def _norm(text):
     return text.strip().replace(" ", "_").replace("-", "_")
@@ -11,28 +13,29 @@ def generate_ontology(grammar, grammar_name, conflitos, first, follow):
     ll_1 = len(conflitos) == 0
 
     ontology_lines = []
-    ontology_lines.append(f"@prefix : <' {NS} '> .")
+    ontology_lines.append(f"@prefix : {NS} .")
     ontology_lines.append("@prefix : <http://www.semanticweb.org/ontologia#> .")
     ontology_lines.append("@prefix owl: <http://www.w3.org/2002/07/owl#> .")
     ontology_lines.append("@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .")
     ontology_lines.append("@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .")
     ontology_lines.append("@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .")
-    ontology_lines.append(f"@base : <' {NS} '> .")
+    ontology_lines.append("@base <http://rpcw.di.uminho.pt/2026/Proj_EL/> .")
+
     ontology_lines.append("")
 
     Gname = _norm(grammar_name)
 
     ontology_lines.append(f"# Gramática {Gname}")
     ontology_lines.append(f":Gram_{Gname} a :Gramatica ;")
-    ontology_lines.append(f"    :name '{Gname}' .")
+    ontology_lines.append(f"    :name '{Gname}' ;")
     ontology_lines.append(f"    :hasStartSymbol :start_{start} ;")
     ontology_lines.append(f"    :isLL1 {'true' if ll_1 else 'false'} ;")
     if non_terminals:
-        ontology_lines.append(f"    :hasNonTerminals {', '.join([f':NT_{nt}' for nt in non_terminals])} ;")
+        ontology_lines.append(f"    :hasNonTerminals {', '.join([f':NT_{tokT(nt)}' for nt in non_terminals])} ;")
     if terminals:
-        ontology_lines.append(f"    :hasTerminals {', '.join([f':T_{t}' for t in terminals])} ;")
+        ontology_lines.append(f"    :hasTerminals {', '.join([f':T_{tokT(t)}' for t in terminals if t != '$'])} ;")
 
-    ontology_lines.append(f"    :hasRoles {', '.join([f':R_{_norm(nt.cabeca)}' for nt in roles])} ;")
+    ontology_lines.append(f"    :hasRoles {', '.join([f':R_{_norm(nt.cabeca)}' for nt in roles])} .")
 
     if conflitos:
         ontology_lines.append(f"    :hasConflicts {', '.join([f':Conflict_{_norm(c)}' for c in conflitos])} .")  
@@ -48,15 +51,23 @@ def generate_ontology(grammar, grammar_name, conflitos, first, follow):
         ontology_lines.append(f":NT_{_norm(nt)} a :NonTerminal ;")
         ontology_lines.append(f"    :name '{_norm(nt)}' ;")
         ontology_lines.append(f"    :belongsTo :Gram_{Gname} ;")
-        ontology_lines.append(f"    :hasFirstSet {', '.join([f':T_{t}' for t in first[nt]])} ;")
-        ontology_lines.append(f"    :hasFollowSet {', '.join([f':T_{t}' for t in follow[nt]])} .")
+        ontology_lines.append(f"    :hasFirstSet {', '.join([f':T_{tokT(t)}' for t in first[nt]])} ;")
+        follow_tokens = follow[nt]
+
+        if len(follow_tokens) == 1 and '$' in follow_tokens:
+            lista_tokens = [":T_EOF"]
+        else:
+            lista_tokens = [f":T_{tokT(t)}" for t in follow_tokens if t != '$']
+
+        tokens_str = ", ".join(lista_tokens)
+        ontology_lines.append(f"    :hasFollowSet {', '.join(lista_tokens)} .")
         ontology_lines.append("")
     
     ontology_lines.append(f"# Terminals")
     for t in terminals:
-        ontology_lines.append(f":T_{_norm(t)} a :Terminal ;")
-        ontology_lines.append(f"    :name '{_norm(t)}' ;")
-        ontology_lines.append(f"    :belongsTo :Gram_{Gname} ;")
+        ontology_lines.append(f":T_{tokT(t)} a :Terminal ;")
+        ontology_lines.append(f"    :name '{tokT(t)}' ;")
+        ontology_lines.append(f"    :belongsTo :Gram_{Gname} .")
         # ontology_lines.append(f"    :hasRegex :Reg{regex} .")
         ontology_lines.append("")
     
@@ -72,9 +83,9 @@ def generate_ontology(grammar, grammar_name, conflitos, first, follow):
                 if m == 'ε':
                     firsts.append(":epsilon")
                 elif m in terminals:
-                    firsts.append(f":T_{_norm(m)}")
+                    firsts.append(f":T_{tokT(m)}")
                 else:
-                    firsts.append(f":NT_{_norm(m)}")
+                    firsts.append(f":NT_{tokT(m)}")
             ontology_lines.append(f"    :hasMembers {', '.join(firsts)} .")
         ontology_lines.append("")
 
@@ -89,9 +100,9 @@ def generate_ontology(grammar, grammar_name, conflitos, first, follow):
                 if m == 'ε':
                     firsts.append(":epsilon")
                 elif m in terminals:
-                    firsts.append(f":T_{_norm(m)}")
-                else:
-                    firsts.append(f":NT_{_norm(m)}")
+                    firsts.append(f":T_{tokT(m)}")
+                elif m != '$' and m in non_terminals:
+                    firsts.append(f":NT_{tokT(m)}")
             ontology_lines.append(f"    :hasMembers {', '.join(firsts)} .")
         ontology_lines.append("")
     
@@ -107,7 +118,7 @@ def generate_ontology(grammar, grammar_name, conflitos, first, follow):
             producoes.append(prod_id)
         
         ontology_lines.append(f"{pid} a :Role ;")
-        ontology_lines.append(f"    :hasHead :NT_{_norm(rule.cabeca)} ;")
+        ontology_lines.append(f"    :hasHead :NT_{tokT(rule.cabeca)} ;")
         if prod:
             ontology_lines.append(f"    :hasProductions {', '.join(producoes)} .")
         ontology_lines.append("")
@@ -118,7 +129,7 @@ def generate_ontology(grammar, grammar_name, conflitos, first, follow):
             ontology_lines.append(f"{prodid} a :Production ;")
             sequencia = [prod.simbolo] + prod.listaSimbolos
             if not its_null:
-                ontology_lines.append(f"    :hasSymbols {', '.join([f':T_{_norm(s.simbolo)}' if s.simbolo in terminals else f':NT_{_norm(s.simbolo)}' for s in sequencia])} .")
+                ontology_lines.append(f"    :hasSymbols {', '.join([f':T_{tokT(s.simbolo)}' if s.simbolo in terminals else f':NT_{_norm(s.simbolo)}' for s in sequencia])} .")
             else:
                 ontology_lines.append(f"    :hasSymbols :epsilon .")
             ontology_lines.append("")

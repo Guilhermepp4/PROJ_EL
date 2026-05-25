@@ -46,7 +46,7 @@
                                 </div>
                             
                                 <div class="w3-border w3-round w3-margin-top" style="overflow: hidden;">
-                                    <textarea id="visitor-editor" name="visitor_code">{{ visitor_content }}</textarea>
+                                    <textarea id="visitor-editor" name="visitor_code">{{ content }}</textarea>
                                 </div>
                             </div>
                         
@@ -189,6 +189,31 @@
                                         </button>
                                     </div>
                                 </div>
+
+                            </form>
+                            <div class="w3-margin-top w3-border w3-round w3-padding w3-white w3-relative" style="overflow-x: auto; max-height: 400px;">
+                                <span class="w3-tag w3-tiny w3-blue w3-round w3-display-topright" style="margin: 8px;">Turtle</span>
+                                <pre style="font-family: 'Fira Code', 'Courier New', monospace; 
+                                            font-size: 13px;
+                                            margin: 0;
+                                            line-height: 1.4;
+                                            color: #2c3e50;
+                                            white-space: pre-wrap;">{{ content if content else '# Nenhum código gerado. Submeta uma gramática primeiro.' }}</pre>
+                            </div>
+                        </div>
+                        <div class="w3-container w3-card w3-white w3-round-large w3-padding-16 w3-margin-top">
+                            <h5><b><i class="fa fa-terminal w3-text-blue"></i> Executar Query SPARQL</b></h5>
+                            <p class="w3-small w3-text-grey">Consulta a ontologia gerada em tempo real através de queries SPARQL ad-hoc.</p>
+                            
+                            <form action="/run_sparql" method="POST">
+                                <div class="w3-margin-bottom">
+                                    <textarea name="sparql_query" class="w3-input w3-border w3-round" 
+                                              style="height: 120px; font-family: 'Fira Code', monospace; font-size: 13px; background-color: #fcfcfc;" 
+                                              placeholder="PREFIX : <http://rpcw.di.uminho.pt/2026/grammar-playground/>&#10;SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 10">{{ sparql_query if sparql_query else '' }}</textarea>
+                                </div>
+                                <button type="submit" class="w3-button w3-blue w3-round w3-right">
+                                    <i class="fa fa-search w3-margin-right"></i>Executar Query
+                                </button>
                             </form>
                         </div>
                     {% endif %}
@@ -248,6 +273,38 @@
                             <pre class="w3-small">{{ resultado.error }}</pre>
                         </div>
                     {% endif %}
+                {% elif resultado_sparql %}
+                    <div class="w3-margin-top w3-padding-16" style="clear: both;">
+                        <h6 class="w3-text-blue"><b><i class="fa fa-table"></i> Resultados da Query:</b></h6>
+                        
+                        {% if resultado_sparql.status == 'success' %}
+                            <div style="overflow-x: auto;">
+                                <table class="w3-table-all w3-hoverable w3-small">
+                                    <thead>
+                                        <tr class="w3-blue">
+                                            {% for col in resultado_sparql.columns %}
+                                                <th>?{{ col }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in resultado_sparql.rows %}
+                                            <tr>
+                                                {% for col in resultado_sparql.columns %}
+                                                    <td>{{ row[col] }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="w3-panel w3-pale-red w3-leftbar w3-border-red">
+                                <h6><b>Erro SPARQL:</b></h6>
+                                <pre class="w3-small" style="white-space: pre-wrap;">{{ resultado_sparql.error }}</pre>
+                            </div>
+                        {% endif %}
+                    </div>
                 {% endif %}
             </div>
         </div>

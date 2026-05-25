@@ -14,7 +14,8 @@ NOMES_SIMBOLOS = {
     '-': 'MINUS',
     '*': 'STAR',
     '/': 'DIV',
-    '=': 'EQUALS'
+    '=': 'EQUALS',
+    'ε': 'EPSILON',
 }
 
 #Função para simplificar um terminal EX: Elems' -> Elems_Prime

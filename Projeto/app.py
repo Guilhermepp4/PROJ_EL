@@ -9,6 +9,7 @@ import tempfile
 import os
 import uuid
 import importlib.util
+from rdflib import Graph
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, 'src')
@@ -201,13 +202,20 @@ def test_page():
     grammar_text = session.get('grammar_text')
     
     context = {
-        'visitor_content': "",
+        'content': "",
         'resultado': None
     }
 
     if mode == 'visitor' and grammar_text:
         grammar_obj = parser_gram(grammar_text)
-        context['visitor_content'] = gera_visitor(grammar_obj)
+        context['content'] = gera_visitor(grammar_obj)
+    elif mode == 'ontology' and grammar_text:
+        grammar_obj = parser_gram(grammar_text)
+        first = compute_first(grammar_obj)
+        follow = compute_follow(first, grammar_obj)
+        _, lista_conflitos = checkLL1(grammar_obj, first, follow)
+        context['content'] = generate_ontology(grammar_obj, "ontology.py", lista_conflitos, first, follow)
+        session['ontology_content'] = context['content']
 
     return render_template("test.html", **context)
     
@@ -273,6 +281,48 @@ def generate_visitor_to_ui():
     return jsonify({'status': 'success', 'code': visitor_code})
 
 
+@app.route('/run_sparql', methods=['POST'])
+def run_sparql():
+    query = request.form.get('sparql_query', '').strip()
+    ontology_content = session.get('ontology_content', '')
+
+    if not ontology_content:
+        resultado_sparql = {'status': 'error', 'message': 'Sem ontologia'}
+        return render_template("test.html", resultado_sparql=resultado_sparql, sparql_query=query,visitor_content=ontology_content)
+
+    if not query:
+        resultado_sparql = {'status': 'error', 'message': 'Sem query'}
+        return render_template("test.html", resultado_sparql=resultado_sparql, sparql_query=query,visitor_content=ontology_content)
+
+    try:
+        g = Graph()
+
+        g.parse(data=ontology_content, format="turtle")
+
+        # 2. Garante que g.query recebe apenas a string da query limpa
+        q_res = g.query(query)
+
+        columns = [str(var) for var in q_res.vars]
+
+        rows = []
+        for row in q_res:
+            row_dict = {}
+            for var in q_res.vars:
+                val = row[var]
+                row_dict[str(var)] = str(val) if val is not None else ""
+            rows.append(row_dict)
+
+        resultado_sparql = {
+            'status': 'success', 
+            'columns': columns, 
+            'rows': rows
+        }
+
+    except Exception as e:
+        print("DEBUG: Erro ao executar a query SPARQL:", str(e))
+        resultado_sparql = {'status': 'error', 'message': f'Erro na execução da query: {str(e)}'}
+
+    return render_template("test.html", resultado_sparql=resultado_sparql, sparql_query=query,content=ontology_content)
 @app.route('/generate_visitor', methods=['POST'])
 def generate_visitor():
     grammar_text = session.get('grammar_text')
@@ -386,6 +436,7 @@ def generateOntology():
     ontology_code = generate_ontology(grammar_obj, file_name, lista_conflitos, first, follow)
 
     response = make_response(ontology_code)
+    
     response.headers['Content-Disposition'] = f'attachment; filename={file_name}'
     response.headers['Content-Type'] = 'text/x-python'
         
